@@ -1,0 +1,1681 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								/* 通用样式 */
+body {
+    /* 引入 Google Fonts: Noto Sans SC 用于正文，Dancing Script 用于标题 */
+    font-family: 'Noto Sans SC', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #FDF8F5; /* 柔和的暖米色背景 */
+    color: #333333; /* 深灰色文字 */
+    line-height: 1.6;
+    scroll-behavior: smooth; /* 平滑滚动效果 */
+}
+
+.container {
+    max-width: 1200px; /* 页面最大宽度 */
+    margin: 30px auto; /* 居中显示，上下更多外边距 */
+    padding: 0 25px; /* 左右内边距 */
+}
+
+/* 头部样式 */
+.site-header {
+    background-color: #FF6B8B; /* 柔和的玫瑰粉 */
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 底部柔和阴影 */
+}
+
+.site-header h1 {
+    font-family: 'Dancing Script', cursive; /* 个性化手写字体 */
+    margin: 0 0 10px;
+    font-size: 3.5em; /* 标题更大 */
+    letter-spacing: 2px; /* 增加字间距 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* 轻微文字阴影 */
+}
+
+.site-header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+    font-weight: 300; /* 字体更细 */
+}
+
+/* 全新 Banner 样式 - 带动画 */
+.banner-section {
+    background-color: #FF6B8B; /* 默认背景色 */
+    color: white;
+    text-align: center;
+    padding: 100px 20px; /* 更多内边距 */
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* 更明显的阴影 */
+}
+
+.banner-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* 流动的渐变背景 */
+    background: linear-gradient(135deg,
+        #FFD1AA 0%,   /* 暖桃色 */
+        #FFADCB 25%,  /* 淡粉色 */
+        #FFD1AA 50%,
+        #FFADCB 75%,
+        #FFD1AA 100%
+    );
+    background-size: 400% 400%; /* 使渐变足够大以便移动 */
+    animation: gradientAnimation 18s ease infinite alternate; /* 18s 动画，缓动，无限重复，来回播放 */
+    z-index: 1; /* 在内容下方 */
+    opacity: 0.8; /* 稍透明 */
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Banner 文字动画 */
+.banner-content h2,
+.banner-content p,
+.banner-btn {
+    opacity: 0; /* 初始状态为透明 */
+    transform: translateY(20px); /* 初始状态稍微向下偏移 */
+    animation-fill-mode: forwards; /* 动画结束后保持最终状态 */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); /* 文字阴影，突出显示 */
+}
+
+.banner-content h2 {
+    font-size: 3.2em;
+    margin-bottom: 20px;
+    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s forwards; /* 曲线缓动 */
+}
+
+.banner-content p {
+    font-size: 1.5em;
+    margin-bottom: 40px;
+    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards;
+}
+
+.banner-btn {
+    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.5s forwards;
+}
+
+@keyframes fadeInSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.banner-btn {
+    background-color: #FF6B8B; /* 与头部颜色一致 */
+    color: white;
+    padding: 14px 30px;
+    border-radius: 30px; /* 更圆润的按钮 */
+    font-size: 1.1em;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 0 15px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.banner-btn:hover {
+    background-color: #E65A7A; /* 鼠标悬停时颜色变深 */
+    transform: translateY(-5px); /* 向上浮动更多 */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+
+/* 章节通用样式 */
+section {
+    background-color: #fff; /* 白色背景 */
+    border-radius: 15px; /* 更大的圆角 */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* 柔和阴影 */
+    margin-bottom: 40px;
+    padding: 35px;
+}
+
+section h2 {
+    font-family: 'Noto Sans SC', sans-serif;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 2.5em;
+    position: relative;
+    padding-bottom: 15px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+section h2::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    width: 80px;
+    height: 5px;
+    background-color: #FFD1AA; /* 柔和的桃色下划线 */
+    border-radius: 3px;
+}
+
+/* 菜单和心愿清单网格布局 */
+.menu-grid, .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 响应式网格，适应更小的卡片 */
+    gap: 30px; /* 网格间距 */
+}
+
+/* 菜单项和心愿项通用样式 */
+.menu-item, .wishlist-item {
+    border: none; /* 移除默认边框 */
+    border-radius: 15px; /* 更大的圆角 */
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* 初始柔和阴影 */
+}
+
+.menu-item:hover, .wishlist-item:hover {
+    transform: translateY(-10px); /* 向上浮动更多 */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* 更明显的阴影 */
+}
+
+.menu-item img, .wishlist-item img {
+    width: 100%;
+    height: 220px; /* 图片高度增加 */
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid #f0f0f0; /* 浅色分隔线 */
+}
+
+.menu-item h3, .wishlist-item h3 {
+    margin: 18px 20px 8px;
+    font-size: 1.6em;
+    color: #333333;
+    font-weight: 700;
+}
+
+.menu-item p, .wishlist-item p {
+    margin: 0 20px 18px;
+    font-size: 1em;
+    color: #666666;
+    flex-grow: 1;
+    line-height: 1.5;
+}
+
+.menu-item .price {
+    display: block;
+    text-align: right;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #FF6B8B; /* 醒目玫瑰粉价格 */
+    padding: 12px 20px 18px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* 菜单点菜按钮 */
+.select-menu-btn {
+    background-color: #66BB6A; /* 柔和绿色 */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px; /* 稍圆润的按钮 */
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    margin: 0 20px 20px auto;
+    display: block;
+    width: fit-content;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.select-menu-btn:hover {
+    background-color: #4CAF50; /* 悬停时更深的绿色 */
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 菜单介绍和添加按钮容器 */
+.menu-intro, .wishlist-intro {
+    text-align: center;
+    font-size: 1.15em;
+    color: #555;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+.add-menu-item-container, .add-wish-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.add-menu-item-btn {
+    background-color: #FFD1AA; /* 桃色添加按钮 */
+    color: #333333;
+    padding: 14px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.add-menu-item-btn:hover {
+    background-color: #FFC099; /* 悬停时颜色变深 */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* 我的订单区样式 */
+.order-section {
+    background-color: #FFF7EC; /* 浅米色背景，与主色调协调 */
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 40px;
+    padding: 35px;
+}
+
+.order-section h2 {
+    color: #FF8A65; /* 柔和的橙色标题 */
+    position: relative;
+}
+.order-section h2::after {
+    background-color: #FF8A65;
+}
+
+#order-summary-list {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    border-top: 1px dashed #e0e0e0;
+    padding-top: 20px;
+}
+
+.order-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dotted #eeeeee;
+    font-size: 1.1em;
+    color: #555;
+    flex-wrap: wrap;
+}
+
+.order-list-item:last-child {
+    border-bottom: none;
+}
+
+.order-item-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
+    flex-wrap: wrap;
+}
+
+.order-item-price-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    flex-shrink: 0;
+    font-weight: bold;
+    color: #FF6B8B;
+}
+
+/* 数量控制按钮和输入框 */
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.btn-qty {
+    background-color: #B0BEC5; /* 柔和的蓝灰色 */
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-qty:hover {
+    background-color: #90A4AE;
+}
+
+/* 数量输入框样式 */
+.item-qty-input {
+    width: 45px; /* 宽度增加 */
+    text-align: center;
+    border: 1px solid #E0E0E0; /* 柔和边框 */
+    border-radius: 5px;
+    padding: 6px 0; /* 填充增加 */
+    font-weight: bold;
+    color: #333333;
+    font-size: 1em;
+    -moz-appearance: textfield; /* 隐藏 Firefox 的默认上下箭头 */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+/* 隐藏 Chrome, Safari, Edge 的默认上下箭头 */
+.item-qty-input::-webkit-outer-spin-button,
+.item-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.item-qty-input:focus {
+    border-color: #64B5F6; /* 聚焦时蓝色边框 */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2); /* 聚焦时蓝色阴影 */
+    background-color: #F8FCFF; /* 聚焦时浅色背景 */
+}
+
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    border-radius: 5px;
+    background-color: #B0BEC5; /* 小按钮颜色 */
+}
+
+.btn-small:hover {
+    background-color: #90A4AE;
+}
+
+.order-total-area {
+    text-align: right;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #FF6B8B; /* 总计颜色 */
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 2px solid #FFD1AA; /* 柔和的桃色边框 */
+}
+
+.order-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 35px;
+    flex-wrap: wrap;
+}
+
+.confirm-order-btn {
+    background-color: #66BB6A; /* 柔和绿色确认按钮 */
+}
+.confirm-order-btn:hover {
+    background-color: #4CAF50;
+}
+
+.clear-order-btn {
+    background-color: #EF5350; /* 柔和红色清空按钮 */
+}
+.clear-order-btn:hover {
+    background-color: #D32F2F;
+}
+
+/* 心愿清单区样式 */
+.wishlist-intro {
+    text-align: center;
+    font-size: 1.15em;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* 新增心愿按钮样式 */
+.add-wish-btn {
+    background-color: #FFD1AA; /* 桃色，与菜单添加按钮协调 */
+    color: #333333;
+    padding: 14px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.add-wish-btn:hover {
+    background-color: #FFC099;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.wishlist-item .status {
+    text-align: right;
+    font-size: 1.05em;
+    font-weight: bold;
+    padding: 12px 20px 18px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: auto;
+}
+
+.wishlist-item .status.fulfilled {
+    color: #4CAF50; /* 达成心愿为绿色 */
+}
+
+.wishlist-item .status.pending {
+    color: #FFCC80; /* 未达成心愿为柔和橙色 */
+}
+
+/* 编辑模式下的样式 */
+.wishlist-item.editing, .menu-item.editing {
+    border: 2px solid #64B5F6; /* 编辑时柔和蓝色边框 */
+    box-shadow: 0 8px 20px rgba(100, 181, 246, 0.3); /* 更明显的蓝色阴影 */
+}
+
+/* 可编辑区域的视觉提示 */
+.wishlist-item h3[contenteditable="true"],
+.wishlist-item p[contenteditable="true"],
+.menu-item h3[contenteditable="true"],
+.menu-item p[contenteditable="true"],
+.menu-item .price[contenteditable="true"] {
+    border: 1px dotted #ccc;
+    padding: 3px 5px;
+    border-radius: 5px;
+    outline: none;
+    background-color: #fcfcfc;
+}
+
+/* 状态选择下拉菜单 */
+.status-select {
+    width: auto;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 0.95em;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* 动作按钮容器 */
+.item-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px 20px 18px;
+    border-top: 1px solid #f0f0f0;
+    gap: 12px; /* 按钮之间间隔 */
+    flex-wrap: wrap;
+}
+
+/* 菜单项的 actions 按钮，点菜按钮会和它们在同一行 */
+.menu-actions {
+    justify-content: flex-start;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* 通用按钮样式 (基础样式) */
+.btn {
+    background-color: #90A4AE; /* 柔和的蓝灰色 */
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.btn:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 编辑按钮特定样式 */
+.edit-btn, .edit-menu-btn {
+    background-color: #64B5F6; /* 柔和蓝色编辑按钮 */
+}
+.edit-btn:hover, .edit-menu-btn:hover {
+    background-color: #42A5F5;
+}
+
+/* 保存按钮特定样式 */
+.save-btn, .save-menu-btn {
+    background-color: #66BB6A; /* 柔和绿色保存按钮 */
+}
+.save-btn:hover, .save-menu-btn:hover {
+    background-color: #4CAF50;
+}
+
+/* 删除按钮特定样式 */
+.delete-btn, .delete-menu-btn {
+    background-color: #EF5350; /* 柔和红色删除按钮 */
+}
+.delete-btn:hover, .delete-menu-btn:hover {
+    background-color: #D32F2F;
+}
+
+/* 更换图片按钮样式 (与上传标签相同, 但此处用于编辑模式) */
+.upload-label {
+    display: inline-block;
+    background-color: #FFCC80; /* 柔和橙色 */
+    color: #333333;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.upload-label:hover {
+    background-color: #FFB74D; /* 悬停深橙色 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 数据管理按钮容器 */
+.data-management {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px dashed #e0e0e0;
+    flex-wrap: wrap;
+}
+
+.export-btn {
+    background-color: #90A4AE; /* 导出按钮 - 柔和蓝灰色 */
+}
+.export-btn:hover {
+    background-color: #78909C;
+}
+
+.import-label {
+    background-color: #81D4FA; /* 导入按钮 - 柔和天蓝色 */
+    color: #333333;
+}
+.import-label:hover {
+    background-color: #4FC3F7;
+}
+
+
+/* 初始加载占位符 */
+.initial-placeholder {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 0;
+    color: #999;
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+
+/* 注意事项 */
+.note {
+    text-align: center;
+    font-size: 0.9em;
+    color: #777;
+    margin-top: 50px;
+    padding: 25px;
+    background-color: #FFF7EC; /* 浅米色背景 */
+    border-radius: 12px;
+    border-left: 6px solid #FFD1AA; /* 柔和桃色左侧边框 */
+    line-height: 1.7;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+.note strong {
+    color: #FF8A65; /* 强调文字颜色 */
+}
+
+/* 底部样式 */
+.site-footer {
+    text-align: center;
+    padding: 30px 20px;
+    background-color: #333333;
+    color: #cccccc;
+    font-size: 0.95em;
+    margin-top: 50px;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .site-header h1 {
+        font-size: 2.5em;
+    }
+    section h2 {
+        font-size: 2em;
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+    }
+    section h2::after {
+        width: 60px;
+        height: 4px;
+    }
+    .menu-grid, .wishlist-grid {
+        grid-template-columns: 1fr;
+    }
+    .container {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+    section {
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    .banner-section {
+        padding: 70px 15px;
+    }
+    .banner-content h2 {
+        font-size: 2.5em;
+    }
+    .banner-content p {
+        font-size: 1.2em;
+    }
+    .banner-btn {
+        display: block;
+        width: 90%;
+        margin: 15px auto;
+        font-size: 1em;
+        padding: 12px 25px;
+    }
+    .item-actions {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px 20px 20px;
+    }
+    .item-actions .btn, .item-actions .upload-label {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .order-actions, .data-management {
+        flex-direction: column;
+    }
+    .order-actions .btn, .data-management .btn, .data-management .import-label {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+    .order-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .order-item-details, .order-item-price-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    .order-item-price-actions > span {
+        margin-right: auto;
+    }
+    .menu-item img, .wishlist-item img {
+        height: 180px; /* 减小图片高度 */
+    }
+    .item-qty-input {
+        width: 40px; /* 小屏幕下输入框宽度 */
+        padding: 5px 0;
+    }
+    .btn-qty {
+        width: 28px;
+        height: 28px;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-header {
+        padding: 35px 15px;
+    }
+    .site-header h1 {
+        font-size: 2em;
+    }
+    .site-header p {
+        font-size: 1em;
+    }
+    section h2 {
+        font-size: 1.8em;
+    }
+    .add-wish-btn, .select-menu-btn, .add-menu-item-btn {
+        font-size: 0.95em;
+        padding: 10px 20px;
+    }
+    .menu-item h3, .wishlist-item h3 {
+        font-size: 1.4em;
+    }
+    .menu-item p, .wishlist-item p {
+        font-size: 0.9em;
+    }
+    .menu-item .price {
+        font-size: 1.3em;
+    }
+    .order-total-area {
+        font-size: 1.5em;
+    }
+}
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>胖欣欣瘦媛媛家庭呵护网</title>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 引入外部CSS文件 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <h1>胖欣欣瘦媛媛家庭呵护网</h1>
+        <p>专属你和她的菜单与心愿清单</p>
+    </header>
+
+    <!-- 全新 Banner 部分 -->
+    <section class="banner-section">
+        <div class="banner-content">
+            <h2>我们的小确幸，从这里开始</h2>
+            <p>精心为您准备的美味，和我们共同期待的未来</p>
+            <a href="#menu-grid-section" class="btn banner-btn">查看菜单</a>
+            <a href="#wishlist-grid-section" class="btn banner-btn">查看心愿</a>
+        </div>
+    </section>
+
+    <main class="container">
+        <!-- 菜单部分 -->
+        <section class="menu-section" id="menu-grid-section">
+            <h2>美味菜单</h2>
+            <p class="menu-intro">在这里，您可以为她准备和调整菜单。</p>
+            <div class="add-menu-item-container">
+                <button class="btn add-menu-item-btn">添加新菜品</button>
+            </div>
+            <div class="menu-grid" id="menu-grid">
+                <!-- 菜单项将由JavaScript动态加载和渲染 -->
+                <div class="initial-placeholder">
+                    <p>正在加载菜单...</p>
+                </div>
+            </div>
+            <!-- 菜单导入/导出按钮 -->
+            <div class="data-management">
+                <button class="btn export-btn" id="export-menu-btn">导出菜单</button>
+                <label for="import-menu-file" class="btn import-label">导入菜单</label>
+                <input type="file" id="import-menu-file" accept=".json" style="display: none;">
+            </div>
+        </section>
+
+        <!-- 我的订单部分 -->
+        <section class="order-section">
+            <h2>我的订单</h2>
+            <div id="order-summary-list">
+                <!-- 订单列表将由JavaScript动态加载和渲染 -->
+                <p>暂无已点菜品。</p>
+            </div>
+            <div class="order-total-area">
+                <span>总计：</span><span id="order-total">¥ 0.00</span>
+            </div>
+            <div class="order-actions">
+                <button class="btn confirm-order-btn">确认订单</button>
+                <button class="btn clear-order-btn">清空订单</button>
+            </div>
+            <!-- 订单导入/导出按钮 -->
+            <div class="data-management">
+                <button class="btn export-btn" id="export-order-btn">导出订单</button>
+                <label for="import-order-file" class="btn import-label">导入订单</label>
+                <input type="file" id="import-order-file" accept=".json" style="display: none;">
+            </div>
+        </section>
+
+        <!-- 心愿清单部分 -->
+        <section class="wishlist-section" id="wishlist-grid-section">
+            <h2>心愿清单</h2>
+            <p class="wishlist-intro">这些是我们共同期待的心愿，努力让它们一一实现！</p>
+            <!-- 新增心愿按钮 -->
+            <div class="add-wish-container">
+                <button class="btn add-wish-btn">添加新心愿</button>
+            </div>
+            <div class="wishlist-grid" id="wishlist-grid">
+                <!-- 心愿项将由JavaScript动态加载和渲染 -->
+                <div class="initial-placeholder">
+                    <p>正在加载心愿清单...</p>
+                </div>
+            </div>
+            <!-- 心愿清单导入/导出按钮 -->
+            <div class="data-management">
+                <button class="btn export-btn" id="export-wishlist-btn">导出心愿清单</button>
+                <label for="import-wishlist-file" class="btn import-label">导入心愿清单</label>
+                <input type="file" id="import-wishlist-file" accept=".json" style="display: none;">
+            </div>
+            <p class="note">
+                <strong>重要提示：</strong>此页面所有数据（菜单、订单、心愿清单）均已保存到您**当前浏览器**的本地存储中。<br>
+                关闭浏览器或刷新页面后数据将保留。但若您清除浏览器数据、更换浏览器或设备，这些数据将丢失。<br>
+                **多设备同步：** 您可以通过**导出**功能保存当前数据，然后将导出的JSON文件传输到另一台设备，再通过**导入**功能载入数据，以实现**手动同步**。<br>
+                **订单通知：** 本页面为纯前端实现，当您确认订单时，订单数据会在浏览器控制台 (F12 打开开发者工具查看) 中打印，同时会尝试通过 `mailto:` 协议打开邮件客户端发送通知。请注意 `mailto:` 需要用户手动确认发送，且可能受浏览器和客户端限制。若需自动通知，需要后端服务器和数据库支持。
+            </p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2023 胖欣欣瘦媛媛家庭呵护网. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuGrid = document.getElementById('menu-grid');
+            const addMenuItemBtn = document.querySelector('.add-menu-item-btn');
+            const orderSummaryList = document.getElementById('order-summary-list');
+            const orderTotalSpan = document.getElementById('order-total');
+            const confirmOrderBtn = document.querySelector('.confirm-order-btn');
+            const clearOrderBtn = document.querySelector('.clear-order-btn');
+
+            const wishlistGrid = document.getElementById('wishlist-grid');
+            const addWishBtn = document.querySelector('.add-wish-btn');
+
+            // 导入导出按钮
+            const exportMenuBtn = document.getElementById('export-menu-btn');
+            const importMenuFile = document.getElementById('import-menu-file');
+            const exportOrderBtn = document.getElementById('export-order-btn');
+            const importOrderFile = document.getElementById('import-order-file');
+            const exportWishlistBtn = document.getElementById('export-wishlist-btn');
+            const importWishlistFile = document.getElementById('import-wishlist-file');
+
+            let menuItems = []; // 存储所有菜单项的数组
+            let wishlistItems = []; // 存储所有心愿清单项的数组
+            let selectedOrder = []; // 存储已点菜单项的数组
+
+            // ========================= 通用数据操作函数 =========================
+            function saveToLocalStorage(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+
+            function loadFromLocalStorage(key, defaultData) {
+                const storedData = localStorage.getItem(key);
+                return storedData ? JSON.parse(storedData) : defaultData;
+            }
+
+            // ========================= 菜单管理相关函数 =========================
+            function loadMenu() {
+                // 如果 localStorage 为空，使用预设的初始数据
+                const defaultMenuItems = [
+                    // 中餐
+                    {
+                        id: 'menu-cn-1',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=宫保鸡丁',
+                        title: '宫保鸡丁',
+                        description: '经典川菜，香辣可口，鸡肉丁与花生、辣椒的完美结合。',
+                        price: 78.00
+                    },
+                    {
+                        id: 'menu-cn-2',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=麻婆豆腐',
+                        title: '麻婆豆腐',
+                        description: '家常川菜，麻辣鲜香，豆腐细嫩，开胃下饭。',
+                        price: 58.00
+                    },
+                    {
+                        id: 'menu-cn-3',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=扬州炒饭',
+                        title: '扬州炒饭',
+                        description: '粒粒分明，配料丰富，蛋香米香交织，老少皆宜。',
+                        price: 45.00
+                    },
+                    {
+                        id: 'menu-cn-4',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=小笼包',
+                        title: '上海小笼包',
+                        description: '皮薄馅大，汤汁鲜美，一口咬下，唇齿留香。',
+                        price: 35.00
+                    },
+                    // 日餐
+                    {
+                        id: 'menu-jp-1',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=寿司拼盘',
+                        title: '寿司拼盘',
+                        description: '新鲜鱼生搭配精致米饭，口味丰富，是日本料理的代表。',
+                        price: 138.00
+                    },
+                    {
+                        id: 'menu-jp-2',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=豚骨拉面',
+                        title: '豚骨拉面',
+                        description: '浓郁豚骨汤底，搭配劲道拉面、叉烧和溏心蛋，满足味蕾。',
+                        price: 75.00
+                    },
+                    {
+                        id: 'menu-jp-3',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=日式天妇罗',
+                        title: '日式天妇罗',
+                        description: '新鲜虾仁与蔬菜裹上薄浆，炸至金黄酥脆，口感轻盈。',
+                        price: 98.00
+                    },
+                    {
+                        id: 'menu-jp-4',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=章鱼小丸子',
+                        title: '章鱼小丸子',
+                        description: '外焦里嫩，Q弹章鱼块，淋上特制酱汁和木鱼花。',
+                        price: 30.00
+                    },
+                    // 韩餐
+                    {
+                        id: 'menu-kr-1',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=韩式拌饭',
+                        title: '韩式拌饭',
+                        description: '五彩蔬菜、肉类与米饭拌入特制辣酱，营养均衡。',
+                        price: 65.00
+                    },
+                    {
+                        id: 'menu-kr-2',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=部队锅',
+                        title: '韩式部队锅',
+                        description: '丰盛的食材，浓郁的汤底，泡菜、火腿、芝士的完美融合。',
+                        price: 118.00
+                    },
+                    {
+                        id: 'menu-kr-3',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=韩式烤肉',
+                        title: '韩式烤肉',
+                        description: '秘制酱料腌制肉片，搭配生菜、泡菜，感受韩式风味。',
+                        price: 158.00
+                    },
+                    {
+                        id: 'menu-kr-4',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=辣炒年糕',
+                        title: '韩式辣炒年糕',
+                        description: 'Q弹年糕与鱼饼在甜辣酱汁中翻炒，街头美食的经典。',
+                        price: 55.00
+                    }
+                ];
+                menuItems = loadFromLocalStorage('myMenu', defaultMenuItems);
+                saveMenu(); // 确保默认数据也被保存一次
+            }
+
+            function saveMenu() {
+                saveToLocalStorage('myMenu', menuItems);
+            }
+
+            function renderMenu() {
+                menuGrid.innerHTML = ''; // 清空现有内容
+
+                menuItems.forEach(item => {
+                    const menuItemElement = document.createElement('div');
+                    menuItemElement.classList.add('menu-item');
+                    menuItemElement.dataset.id = item.id;
+
+                    menuItemElement.innerHTML = `
+                        <img src="${item.imageSrc}" alt="${item.title}">
+                        <h3 contenteditable="false">${item.title}</h3>
+                        <p contenteditable="false">${item.description}</p>
+                        <span class="price" contenteditable="false">¥ ${item.price.toFixed(2)}</span>
+                        <div class="item-actions menu-actions">
+                            <label for="menu-file-input-${item.id}" class="upload-label" style="display: none;">更换图片</label>
+                            <input type="file" id="menu-file-input-${item.id}" accept="image/*" style="display: none;">
+                            <button class="btn edit-menu-btn">编辑</button>
+                            <button class="btn delete-menu-btn">删除</button>
+                        </div>
+                        <button class="btn select-menu-btn">点菜</button>
+                    `;
+                    menuGrid.appendChild(menuItemElement);
+                });
+            }
+
+            function toggleMenuEditMode(itemElement, isEditMode) {
+                const itemId = itemElement.dataset.id;
+                const itemData = menuItems.find(item => item.id === itemId);
+
+                const titleElement = itemElement.querySelector('h3');
+                const descriptionElement = itemElement.querySelector('p');
+                const priceElement = itemElement.querySelector('.price');
+                const editSaveBtn = itemElement.querySelector('.edit-menu-btn, .save-menu-btn');
+                const uploadLabel = itemElement.querySelector('.upload-label');
+                const selectMenuBtn = itemElement.querySelector('.select-menu-btn');
+
+
+                if (!itemData) return;
+
+                if (isEditMode) {
+                    itemElement.classList.add('editing');
+                    titleElement.setAttribute('contenteditable', 'true');
+                    descriptionElement.setAttribute('contenteditable', 'true');
+                    priceElement.setAttribute('contenteditable', 'true');
+                    titleElement.focus();
+
+                    editSaveBtn.textContent = '保存';
+                    editSaveBtn.classList.remove('edit-menu-btn');
+                    editSaveBtn.classList.add('save-menu-btn');
+                    uploadLabel.style.display = 'inline-block';
+                    selectMenuBtn.style.display = 'none'; // 编辑时隐藏点菜按钮
+
+                } else {
+                    itemElement.classList.remove('editing');
+                    titleElement.removeAttribute('contenteditable');
+                    descriptionElement.removeAttribute('contenteditable');
+                    priceElement.removeAttribute('contenteditable');
+
+                    itemData.title = titleElement.textContent.trim();
+                    itemData.description = descriptionElement.textContent.trim();
+                    // 尝试解析价格，如果无效则保留原价
+                    const newPrice = parseFloat(priceElement.textContent.replace(/[^\d.]/g, '')); // 移除所有非数字和小数点的字符
+                    if (!isNaN(newPrice) && newPrice >= 0) { // 确保是有效数字且不为负
+                        itemData.price = newPrice;
+                    } else {
+                        alert('价格输入无效，已恢复原价。请确保输入的是数字。');
+                    }
+                    priceElement.textContent = `¥ ${itemData.price.toFixed(2)}`; // 强制更新显示为固定格式
+
+                    saveMenu();
+                    renderMenu(); // 重新渲染页面以反映更改 (价格、图片)
+                }
+            }
+
+            // ========================= 心愿清单相关函数 =========================
+            function loadWishlist() {
+                wishlistItems = loadFromLocalStorage('myWishlist', [
+                    {
+                        id: 'wish-1',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=智能手表',
+                        title: '一款智能手表',
+                        description: '希望拥有一款能够追踪健康数据、方便生活与运动的智能穿戴设备。',
+                        status: 'pending'
+                    },
+                    {
+                        id: 'wish-2',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=浪漫旅行',
+                        title: '一次浪漫旅行',
+                        description: '希望和你一起去一个美丽的地方，留下属于我们的美好回忆。',
+                        status: 'pending'
+                    },
+                    {
+                        id: 'wish-3',
+                        imageSrc: 'https://via.placeholder.com/300x200?text=一本好书',
+                        title: '一本深度与广度兼具的文学作品，丰富精神世界。',
+                        status: 'fulfilled'
+                    }
+                ]);
+                saveWishlist(); // 确保默认数据也被保存一次
+            }
+
+            function saveWishlist() {
+                saveToLocalStorage('myWishlist', wishlistItems);
+            }
+
+            function renderWishlist() {
+                wishlistGrid.innerHTML = ''; // 清空现有内容
+
+                wishlistItems.forEach(item => {
+                    const wishlistItemElement = document.createElement('div');
+                    wishlistItemElement.classList.add('wishlist-item');
+                    wishlistItemElement.dataset.id = item.id;
+
+                    const statusText = item.status === 'pending' ? '未达成' : '已达成';
+
+                    wishlistItemElement.innerHTML = `
+                        <img src="${item.imageSrc}" alt="${item.title}">
+                        <h3 contenteditable="false">${item.title}</h3>
+                        <p contenteditable="false">${item.description}</p>
+                        <p class="status ${item.status}" data-status="${item.status}">${statusText}</p>
+                        <div class="item-actions">
+                            <label for="wish-file-input-${item.id}" class="upload-label" style="display: none;">更换图片</label>
+                            <input type="file" id="wish-file-input-${item.id}" accept="image/*" style="display: none;">
+                            <button class="btn edit-btn">编辑</button>
+                            <button class="btn delete-btn">删除</button>
+                        </div>
+                    `;
+                    wishlistGrid.appendChild(wishlistItemElement);
+                });
+            }
+
+            function toggleWishlistEditMode(itemElement, isEditMode) {
+                const itemId = itemElement.dataset.id;
+                const itemData = wishlistItems.find(item => item.id === itemId);
+
+                const titleElement = itemElement.querySelector('h3');
+                const descriptionElement = itemElement.querySelector('p:not(.status)');
+                const statusElement = itemElement.querySelector('.status');
+                const editSaveBtn = itemElement.querySelector('.edit-btn, .save-btn');
+                const uploadLabel = itemElement.querySelector('.upload-label');
+
+                if (!itemData) return;
+
+                if (isEditMode) {
+                    itemElement.classList.add('editing');
+                    titleElement.setAttribute('contenteditable', 'true');
+                    descriptionElement.setAttribute('contenteditable', 'true');
+                    titleElement.focus();
+
+                    statusElement.innerHTML = `
+                        <select class="status-select">
+                            <option value="pending" ${itemData.status === 'pending' ? 'selected' : ''}>未达成</option>
+                            <option value="fulfilled" ${itemData.status === 'fulfilled' ? 'selected' : ''}>已达成</option>
+                        </select>
+                    `;
+
+                    editSaveBtn.textContent = '保存';
+                    editSaveBtn.classList.remove('edit-btn');
+                    editSaveBtn.classList.add('save-btn');
+                    uploadLabel.style.display = 'inline-block';
+                } else {
+                    itemElement.classList.remove('editing');
+                    titleElement.removeAttribute('contenteditable');
+                    descriptionElement.removeAttribute('contenteditable');
+
+                    itemData.title = titleElement.textContent.trim();
+                    itemData.description = descriptionElement.textContent.trim();
+
+                    const statusSelect = itemElement.querySelector('.status-select');
+                    if (statusSelect) {
+                        itemData.status = statusSelect.value;
+                    }
+
+                    saveWishlist();
+                    renderWishlist(); // 重新渲染页面以反映更改
+                }
+            }
+
+            // ========================= 订单管理相关函数 =========================
+            function loadSelectedOrder() {
+                selectedOrder = loadFromLocalStorage('mySelectedOrder', []);
+            }
+
+            function saveSelectedOrder() {
+                saveToLocalStorage('mySelectedOrder', selectedOrder);
+            }
+
+            function addToOrder(menuItemId) {
+                // 从当前菜单数据中查找菜品，而不是固定数据
+                const menuItem = menuItems.find(item => item.id === menuItemId);
+                if (!menuItem) return;
+
+                const existingOrderItem = selectedOrder.find(item => item.id === menuItemId);
+                if (existingOrderItem) {
+                    existingOrderItem.quantity++;
+                } else {
+                    selectedOrder.push({
+                        id: menuItem.id,
+                        title: menuItem.title,
+                        price: menuItem.price,
+                        quantity: 1
+                    });
+                }
+                saveSelectedOrder();
+                renderOrderSummary();
+            }
+
+            // 增加菜品数量
+            function increaseOrderItemQuantity(orderItemId) {
+                const orderItem = selectedOrder.find(item => item.id === orderItemId);
+                if (orderItem) {
+                    orderItem.quantity++;
+                    saveSelectedOrder();
+                    renderOrderSummary();
+                }
+            }
+
+            // 减少菜品数量
+            function decreaseOrderItemQuantity(orderItemId) {
+                const orderItem = selectedOrder.find(item => item.id === orderItemId);
+                if (orderItem) {
+                    orderItem.quantity--;
+                    if (orderItem.quantity <= 0) {
+                        // 如果数量小于等于0，则移除该菜品
+                        selectedOrder = selectedOrder.filter(item => item.id !== orderItemId);
+                    }
+                    saveSelectedOrder();
+                    renderOrderSummary();
+                }
+            }
+
+            function renderOrderSummary() {
+                orderSummaryList.innerHTML = '';
+                let total = 0;
+
+                if (selectedOrder.length === 0) {
+                    orderSummaryList.innerHTML = '<p>暂无已点菜品。</p>';
+                } else {
+                    selectedOrder.forEach(orderItem => {
+                        const listItem = document.createElement('div');
+                        listItem.classList.add('order-list-item');
+                        listItem.innerHTML = `
+                            <div class="order-item-details">
+                                <span>${orderItem.title}</span>
+                                <div class="qty-controls">
+                                    <button class="btn btn-qty decrease-qty-btn" data-id="${orderItem.id}">-</button>
+                                    <input type="number" class="item-qty-input" value="${orderItem.quantity}" min="0" data-id="${orderItem.id}">
+                                    <button class="btn btn-qty increase-qty-btn" data-id="${orderItem.id}">+</button>
+                                </div>
+                            </div>
+                            <div class="order-item-price-actions">
+                                <span>¥ ${(orderItem.price * orderItem.quantity).toFixed(2)}</span>
+                                <button class="btn btn-small remove-order-item-btn" data-id="${orderItem.id}">移除</button>
+                            </div>
+                        `;
+                        orderSummaryList.appendChild(listItem);
+                        total += orderItem.price * orderItem.quantity;
+                    });
+                }
+                orderTotalSpan.textContent = `¥ ${total.toFixed(2)}`;
+            }
+
+            function clearOrder() {
+                if (confirm('确定要清空所有已点菜品吗？')) {
+                    selectedOrder = [];
+                    saveSelectedOrder();
+                    renderOrderSummary();
+                    alert('订单已清空！');
+                }
+            }
+
+            function confirmOrder() {
+                if (selectedOrder.length === 0) {
+                    alert('您的订单为空，请先点菜！');
+                    return;
+                }
+
+                let orderDetailsText = "";
+                let totalAmount = 0;
+                const currentDate = new Date().toLocaleString();
+
+                orderDetailsText += `订单时间: ${currentDate}\n`;
+                orderDetailsText += `\n--- 订单详情 ---\n`;
+
+                selectedOrder.forEach(item => {
+                    const subtotal = item.price * item.quantity;
+                    orderDetailsText += `${item.title} x ${item.quantity} (¥ ${item.price.toFixed(2)}/份) = ¥ ${subtotal.toFixed(2)}\n`;
+                    totalAmount += subtotal;
+                });
+
+                orderDetailsText += `\n总计：¥ ${totalAmount.toFixed(2)}\n`;
+                orderDetailsText += `\n这是一个来自胖欣欣瘦媛媛家庭呵护网的新订单通知。\n请及时处理！`;
+
+                // --- 邮件通知部分（使用 mailto: 协议） ---
+                // 使用 encodeURIComponent 编码，以确保特殊字符在URL中正确显示
+                const recipientEmail = "xinluo1231998@gmail.com"; // <-- 您的邮箱地址
+                const subject = encodeURIComponent(`胖欣欣瘦媛媛家庭呵护网 - 新订单通知 (${currentDate})`);
+                const body = encodeURIComponent(orderDetailsText);
+
+                const mailtoLink = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+
+                // 提示用户并尝试打开邮件客户端
+                alert("订单已成功提交！\n\n接下来将尝试打开您的邮件客户端发送通知。\n请在弹出的邮件窗口中点击“发送”按钮以完成通知。\n\n完整的订单信息已在浏览器控制台（F12）中打印。");
+
+                // 在新窗口或标签页中打开 mailto 链接，避免直接跳转当前页面
+                window.open(mailtoLink, '_blank');
+                // --- 邮件通知部分结束 ---
+
+
+                // !! 后台接收信息模拟 (打印到控制台) !!
+                // 此部分保持不变，以便您仍然可以在控制台查看完整的结构化数据
+                console.log('--- 模拟订单数据发送到后台 ---');
+                console.log('订单数据:', {
+                    timestamp: currentDate,
+                    items: selectedOrder.map(item => ({
+                        id: item.id,
+                        title: item.title,
+                        price: item.price,
+                        quantity: item.quantity,
+                        subtotal: (item.price * item.quantity).toFixed(2)
+                    })),
+                    total: totalAmount.toFixed(2)
+                });
+                console.log('提示: 这部分数据现在打印在浏览器控制台。要实现真正的后台接收和自动邮件通知，需要后端服务和API。');
+                console.log('----------------------------');
+
+                // 订单确认后清空订单
+                selectedOrder = [];
+                saveSelectedOrder();
+                renderOrderSummary();
+            }
+
+            // ========================= 导入/导出功能函数 =========================
+
+            // 导出数据通用函数
+            function exportData(data, filename) {
+                const jsonData = JSON.stringify(data, null, 2); // 格式化JSON，方便阅读
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert(`数据已成功导出为 ${filename}`);
+            }
+
+            // 导入数据通用函数
+            function importData(event, type) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedArray = JSON.parse(e.target.result);
+
+                        // 简单的验证
+                        if (!Array.isArray(importedArray)) {
+                            throw new Error('导入的文件不是有效的数组格式。');
+                        }
+
+                        let isValid = true;
+                        let message = '';
+
+                        if (type === 'wishlist') {
+                            isValid = importedArray.every(item =>
+                                typeof item.id === 'string' &&
+                                typeof item.imageSrc === 'string' &&
+                                typeof item.title === 'string' &&
+                                typeof item.description === 'string' &&
+                                ['pending', 'fulfilled'].includes(item.status)
+                            );
+                            message = '心愿清单';
+                        } else if (type === 'order') {
+                            isValid = importedArray.every(item =>
+                                typeof item.id === 'string' &&
+                                typeof item.title === 'string' &&
+                                typeof item.price === 'number' &&
+                                typeof item.quantity === 'number' &&
+                                item.quantity >= 0
+                            );
+                            message = '订单';
+                        } else if (type === 'menu') {
+                            isValid = importedArray.every(item =>
+                                typeof item.id === 'string' &&
+                                typeof item.imageSrc === 'string' &&
+                                typeof item.title === 'string' &&
+                                typeof item.description === 'string' &&
+                                typeof item.price === 'number' &&
+                                item.price >= 0
+                            );
+                            message = '菜单';
+                        }
+
+                        if (!isValid) {
+                            throw new Error(`导入的${message}数据结构不符合预期，请检查JSON文件内容。`);
+                        }
+
+                        if (confirm(`确定要导入${message}吗？这会覆盖当前所有${message}数据。`)) {
+                            if (type === 'wishlist') {
+                                wishlistItems = importedArray;
+                                saveWishlist();
+                                renderWishlist();
+                            } else if (type === 'order') {
+                                selectedOrder = importedArray;
+                                saveSelectedOrder();
+                                renderOrderSummary();
+                            } else if (type === 'menu') {
+                                menuItems = importedArray;
+                                saveMenu();
+                                renderMenu();
+                            }
+                            alert(`${message}已成功导入！`);
+                        }
+                    } catch (error) {
+                        console.error('导入数据失败:', error);
+                        alert('导入数据失败: ' + error.message + '\n请确保导入的是有效的JSON文件且数据结构正确。');
+                    }
+                };
+                reader.readAsText(file);
+                // 清空文件输入框，以便再次选择相同文件
+                event.target.value = '';
+            }
+
+
+            // ========================= 事件监听器 =========================
+            // 菜单“添加新菜品”按钮
+            addMenuItemBtn.addEventListener('click', () => {
+                const newId = `menu-${Date.now()}`;
+                const newItem = {
+                    id: newId,
+                    imageSrc: 'https://via.placeholder.com/300x200?text=新菜品图片',
+                    title: '新菜品名称',
+                    description: '新菜品描述...',
+                    price: 0.00
+                };
+                menuItems.unshift(newItem); // 添加到数组开头
+                saveMenu();
+                renderMenu(); // 重新渲染整个列表
+
+                const newItemElement = menuGrid.querySelector(`[data-id="${newId}"]`);
+                if (newItemElement) {
+                    toggleMenuEditMode(newItemElement, true);
+                    newItemElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
+            // 菜单项事件委托（编辑、删除、图片上传、点菜）
+            menuGrid.addEventListener('click', (event) => {
+                const target = event.target;
+                const menuItemElement = target.closest('.menu-item');
+
+                if (!menuItemElement) return;
+
+                const itemId = menuItemElement.dataset.id;
+
+                if (target.classList.contains('delete-menu-btn')) {
+                    if (confirm('确定要删除此菜品吗？')) {
+                        menuItems = menuItems.filter(item => item.id !== itemId);
+                        saveMenu();
+                        renderMenu();
+                    }
+                } else if (target.classList.contains('edit-menu-btn')) {
+                    toggleMenuEditMode(menuItemElement, true);
+                } else if (target.classList.contains('save-menu-btn')) {
+                    toggleMenuEditMode(menuItemElement, false);
+                } else if (target.classList.contains('upload-label')) {
+                    const fileInput = menuItemElement.querySelector(`#menu-file-input-${itemId}`);
+                    if (fileInput) {
+                        fileInput.click();
+                    }
+                } else if (target.classList.contains('select-menu-btn')) {
+                    addToOrder(itemId);
+                }
+            });
+
+            // 菜单项图片上传
+            menuGrid.addEventListener('change', (event) => {
+                const target = event.target;
+                if (target.type === 'file' && target.accept === 'image/*') {
+                    const menuItemElement = target.closest('.menu-item');
+                    const itemId = menuItemElement.dataset.id;
+                    const itemData = menuItems.find(item => item.id === itemId);
+
+                    if (itemData && target.files && target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            itemData.imageSrc = e.target.result;
+                            saveMenu();
+                            menuItemElement.querySelector('img').src = e.target.result;
+                        };
+                        reader.readAsDataURL(target.files[0]);
+                    }
+                }
+            });
+
+
+            // 心愿清单事件委托
+            wishlistGrid.addEventListener('click', (event) => {
+                const target = event.target;
+                const wishlistItem = target.closest('.wishlist-item');
+
+                if (!wishlistItem) return;
+
+                const itemId = wishlistItem.dataset.id;
+
+                if (target.classList.contains('delete-btn')) {
+                    if (confirm('确定要删除此心愿吗？')) {
+                        wishlistItems = wishlistItems.filter(item => item.id !== itemId);
+                        saveWishlist();
+                        renderWishlist();
+                    }
+                } else if (target.classList.contains('edit-btn')) {
+                    toggleWishlistEditMode(wishlistItem, true);
+                } else if (target.classList.contains('save-btn')) {
+                    toggleWishlistEditMode(wishlistItem, false);
+                } else if (target.classList.contains('upload-label')) {
+                    const fileInput = wishlistItem.querySelector(`#wish-file-input-${itemId}`);
+                    if (fileInput) {
+                        fileInput.click();
+                    }
+                }
+            });
+
+            // 心愿清单文件输入框的 change 事件
+            wishlistGrid.addEventListener('change', (event) => {
+                const target = event.target;
+                if (target.type === 'file' && target.accept === 'image/*') {
+                    const wishlistItemElement = target.closest('.wishlist-item');
+                    const itemId = wishlistItemElement.dataset.id;
+                    const itemData = wishlistItems.find(item => item.id === itemId);
+
+                    if (itemData && target.files && target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            itemData.imageSrc = e.target.result;
+                            saveWishlist();
+                            wishlistItemElement.querySelector('img').src = e.target.result;
+                        };
+                        reader.readAsDataURL(target.files[0]);
+                    }
+                }
+            });
+
+            // 添加新心愿按钮点击事件
+            addWishBtn.addEventListener('click', () => {
+                const newId = `wish-${Date.now()}`;
+                const newItem = {
+                    id: newId,
+                    imageSrc: 'https://via.placeholder.com/300x200?text=点击更换图片',
+                    title: '新心愿标题',
+                    description: '请在此输入您的心愿描述...',
+                    status: 'pending'
+                };
+                wishlistItems.unshift(newItem);
+                saveWishlist();
+                renderWishlist();
+
+                const newItemElement = wishlistGrid.querySelector(`[data-id="${newId}"]`);
+                if (newItemElement) {
+                    toggleWishlistEditMode(newItemElement, true);
+                    newItemElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
+
+            // 订单“移除”、“增加数量”和“减少数量”按钮事件委托
+            orderSummaryList.addEventListener('click', (event) => {
+                const target = event.target;
+                const orderItemId = target.dataset.id;
+
+                if (target.classList.contains('remove-order-item-btn')) {
+                    if (confirm('确定要移除此菜品吗？')) {
+                        selectedOrder = selectedOrder.filter(item => item.id !== orderItemId);
+                        saveSelectedOrder();
+                        renderOrderSummary();
+                    }
+                } else if (target.classList.contains('increase-qty-btn')) {
+                    increaseOrderItemQuantity(orderItemId);
+                } else if (target.classList.contains('decrease-qty-btn')) {
+                    decreaseOrderItemQuantity(orderItemId);
+                }
+            });
+
+            // 订单数量输入框的 change 事件 (失去焦点或按回车时触发)
+            orderSummaryList.addEventListener('change', (event) => {
+                const target = event.target;
+                if (target.classList.contains('item-qty-input')) {
+                    const orderItemId = target.dataset.id;
+                    let newQuantity = parseInt(target.value, 10);
+
+                    if (isNaN(newQuantity) || newQuantity < 0) {
+                        // Revert to previous valid quantity if input is invalid
+                        const currentItem = selectedOrder.find(item => item.id === orderItemId);
+                        target.value = currentItem ? currentItem.quantity : 1; // Default to 1 if not found or invalid
+                        alert('请输入有效的数量 (非负整数)。');
+                        return;
+                    }
+
+                    // Find the item and update its quantity
+                    const orderItem = selectedOrder.find(item => item.id === orderItemId);
+                    if (orderItem) {
+                        if (newQuantity === 0) {
+                            // If quantity becomes 0, remove the item
+                            selectedOrder = selectedOrder.filter(item => item.id !== orderItemId);
+                        } else {
+                            orderItem.quantity = newQuantity;
+                        }
+                        saveSelectedOrder();
+                        renderOrderSummary();
+                    }
+                }
+            });
+
+
+            // 订单“清空”按钮事件
+            clearOrderBtn.addEventListener('click', clearOrder);
+
+            // 订单“确认订单”按钮事件
+            confirmOrderBtn.addEventListener('click', confirmOrder);
+
+            // 导入/导出事件监听
+            exportMenuBtn.addEventListener('click', () => exportData(menuItems, '胖欣欣瘦媛媛_菜单.json'));
+            importMenuFile.addEventListener('change', (e) => importData(e, 'menu'));
+
+            exportOrderBtn.addEventListener('click', () => exportData(selectedOrder, '胖欣欣瘦媛媛_我的订单.json'));
+            importOrderFile.addEventListener('change', (e) => importData(e, 'order'));
+
+            exportWishlistBtn.addEventListener('click', () => exportData(wishlistItems, '胖欣欣瘦媛媛_心愿清单.json'));
+            importWishlistFile.addEventListener('change', (e) => importData(e, 'wishlist'));
+
+
+            // ========================= 页面初始化 =========================
+            loadMenu();
+            renderMenu();
+            loadWishlist();
+            renderWishlist();
+            loadSelectedOrder();
+            renderOrderSummary();
+        });
+    </script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
