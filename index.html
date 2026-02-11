@@ -7,536 +7,91 @@
   <meta name="description" content="极简莫兰迪风：点菜 + 心愿 + 确认下单（本地保存 + 高清图 IndexedDB + Formspree 邮件通知）" />
   <style>
     :root{
-      /* Morandi palette */
-      --bg: #F6F3EE;          /* 奶油白 */
-      --card: #FFFFFF;
-      --ink: #1F2328;
-      --muted: #6D7179;
-      --line: rgba(31,35,40,.10);
-
-      --pink: #C7A5A9;        /* 莫兰迪粉 */
-      --sage: #AEB9AD;        /* 灰绿 */
-      --slate: #8D97A1;       /* 灰蓝 */
-      --clay: #C8B3A4;        /* 奶茶 */
-
-      --shadow: 0 14px 36px rgba(31,35,40,.08);
-      --shadow2: 0 10px 22px rgba(31,35,40,.06);
-      --radius: 22px;
-      --radius2: 18px;
-    }
-
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-      color: var(--ink);
-      background: var(--bg);
-      letter-spacing: .1px;
-    }
-
-    .wrap{
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 28px 16px 56px;
-    }
-
-    /* Header */
-    .hero{
-      background: rgba(255,255,255,.78);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px 22px 18px;
-    }
-
-    .heroTop{
-      display:flex;
-      justify-content: space-between;
-      align-items:flex-start;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    h1{
-      margin: 0;
-      font-size: clamp(22px, 2.5vw, 34px);
-      font-weight: 900;
-    }
-
-    .sub{
-      margin-top: 10px;
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 14px;
-      max-width: 860px;
-    }
-
-    .quoteRow{
-      margin-top: 14px;
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .chip{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.75);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
-      color: rgba(31,35,40,.78);
-    }
-
-    .heroActions{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      margin-left: auto;
-    }
-
-    button{
-      font: inherit;
-      cursor: pointer;
-    }
-
-    .btn{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.85);
-      padding: 10px 12px;
-      border-radius: 14px;
-      transition: transform .05s ease, background .15s ease, border-color .15s ease;
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      user-select:none;
-    }
-    .btn:hover{ background: #fff; border-color: rgba(31,35,40,.16); }
-    .btn:active{ transform: translateY(1px); }
-    .btn.primary{
-      background: rgba(199,165,169,.18);
-      border-color: rgba(199,165,169,.35);
-    }
-    .btn.sage{
-      background: rgba(174,185,173,.20);
-      border-color: rgba(174,185,173,.40);
-    }
-    .btn.danger{
-      background: rgba(255,255,255,.85);
-      border-color: rgba(170,70,70,.25);
-      color: rgba(140,40,40,.95);
-    }
-
-    .grid{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-    @media(min-width: 980px){
-      .grid{ grid-template-columns: 1.55fr 1fr; }
-    }
-
-    .panel{
-      background: rgba(255,255,255,.80);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow2);
-      overflow:hidden;
-    }
-
-    .panelHead{
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid var(--line);
-      display:flex;
-      align-items:flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .panelTitle{
-      margin:0;
-      font-size: 16px;
-      font-weight: 900;
-    }
-    .panelDesc{
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .tabs{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .tab{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.75);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 12px;
-      color: rgba(31,35,40,.78);
-      cursor:pointer;
-      user-select:none;
-    }
-    .tab.active{
-      background: rgba(141,151,161,.14);
-      border-color: rgba(141,151,161,.35);
-      color: rgba(31,35,40,.88);
-    }
-
-    .searchRow{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      align-items:center;
-    }
-    .field{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.92);
-      padding: 10px 12px;
-      border-radius: 14px;
-      outline:none;
-      min-width: 240px;
-      flex: 1;
-    }
-    .field:focus{ border-color: rgba(141,151,161,.55); }
-
-    .content{
-      padding: 14px;
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media(min-width: 640px){
-      .cards{ grid-template-columns: 1fr 1fr; }
-    }
-
-    .card{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.92);
-      border-radius: var(--radius2);
-      overflow:hidden;
-      display:flex;
-      flex-direction: column;
-      min-height: 290px;
-    }
-
-    .thumb{
-      height: 150px;
-      background: linear-gradient(135deg, rgba(199,165,169,.18), rgba(174,185,173,.16));
-      position: relative;
-      border-bottom: 1px solid var(--line);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .thumb img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-    .thumb .thumbHint{
-      position:absolute;
-      inset:auto 10px 10px 10px;
-      display:flex;
-      justify-content: space-between;
-      gap: 8px;
-      pointer-events:none;
-    }
-    .pill{
-      border: 1px solid rgba(31,35,40,.10);
-      background: rgba(255,255,255,.72);
-      border-radius: 999px;
-      padding: 6px 9px;
-      font-size: 12px;
-      color: rgba(31,35,40,.78);
-      backdrop-filter: blur(6px);
-      max-width: 100%;
-      overflow:hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .cardBody{
-      padding: 12px 12px 14px;
-      display:flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
-    }
-
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .name{
-      margin:0;
-      font-weight: 900;
-      font-size: 15px;
-    }
-
-    .meta{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-
-    .badge{
-      font-size: 12px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(31,35,40,.10);
-      background: rgba(255,255,255,.72);
-      color: rgba(31,35,40,.74);
-    }
-
-    .price{
-      font-size: 12px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(31,35,40,.10);
-      background: rgba(255,255,255,.72);
-      color: rgba(31,35,40,.78);
-    }
-
-    .note{
-      width:100%;
-      min-height: 72px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.92);
-      border-radius: 14px;
-      padding: 10px 12px;
-      outline:none;
-      line-height: 1.55;
-      color: rgba(31,35,40,.88);
-    }
-    .note:focus{ border-color: rgba(141,151,161,.55); }
-
-    .btnRow{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-    }
-
-    .selectRow{
-      display:flex;
-      justify-content: space-between;
-      align-items:center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .toggle{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      user-select:none;
-      font-size: 13px;
-      color: rgba(31,35,40,.82);
-    }
-
-    input[type="checkbox"]{
-      width: 18px;
-      height: 18px;
-      accent-color: var(--pink);
-    }
-
-    /* Right panel: order summary */
-    .summary{
-      padding: 14px;
-      display:flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .summaryBox{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.92);
-      border-radius: var(--radius2);
-      padding: 12px;
-    }
-
-    .summaryTitle{
-      margin:0 0 6px;
-      font-weight: 900;
-      font-size: 14px;
-    }
-
-    .summaryList{
-      margin:0;
-      padding-left: 18px;
-      color: rgba(31,35,40,.86);
-      line-height: 1.65;
-      font-size: 13px;
-    }
-
-    .small{
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .cta{
-      padding: 14px;
-      border-top: 1px solid var(--line);
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-      justify-content: space-between;
-      background: rgba(255,255,255,.78);
-    }
-
-    .ctaMain{
-      display:flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .ctaBig{
-      font-weight: 900;
-      font-size: 14px;
-    }
-
-    .btn.big{
-      padding: 12px 14px;
-      border-radius: 16px;
-    }
-
-    /* Toast */
-    .toast{
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      width: min(380px, calc(100vw - 32px));
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(31,35,40,.10);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      padding: 12px 12px;
-      display:none;
-      gap: 8px;
-      align-items:flex-start;
-    }
-    .toast.show{ display:flex; }
-    .toast b{ font-size: 13px; }
-    .toast .t{
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-      margin-top: 2px;
-    }
-
-    /* Modal */
-    .modal{
-      position: fixed;
-      inset: 0;
-      background: rgba(31,35,40,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      z-index: 999;
-    }
-    .modal.show{ display:flex; }
-    .modalCard{
-      width: min(720px, 100%);
-      border-radius: 22px;
-      background: rgba(255,255,255,.94);
-      border: 1px solid rgba(255,255,255,.20);
-      box-shadow: 0 24px 70px rgba(0,0,0,.25);
-      overflow:hidden;
-    }
-    .modalHead{
-      padding: 12px 12px;
-      border-bottom: 1px solid rgba(31,35,40,.10);
-      display:flex;
-      justify-content: space-between;
-      align-items:center;
-      gap: 10px;
-    }
-    .modalHead .title{
-      font-weight: 900;
-      font-size: 13px;
-      color: rgba(31,35,40,.85);
-      overflow:hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      max-width: 70%;
-    }
-    .modalBody{
-      padding: 12px;
-      display:flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .formGrid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    @media(min-width: 560px){
-      .formGrid{ grid-template-columns: 1fr 1fr; }
-    }
-    .label{
-      font-size: 12px;
-      color: rgba(31,35,40,.72);
-      margin-bottom: 6px;
-    }
-    .control{
-      display:flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .select{
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.92);
-      padding: 10px 12px;
-      border-radius: 14px;
-      outline:none;
-    }
-
-    /* Image preview modal */
-    .imgModalBody{
-      padding: 10px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: rgba(255,255,255,.78);
-    }
-    .imgModalBody img{
-      max-width: 100%;
-      max-height: 78vh;
-      border-radius: 16px;
-      display:block;
-    }
-
-    footer{
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-      line-height: 1.7;
-      padding: 10px 0;
-    }
+      --bg:#F6F3EE; --card:#FFFFFF; --ink:#1F2328; --muted:#6D7179; --line:rgba(31,35,40,.10);
+      --pink:#C7A5A9; --sage:#AEB9AD; --slate:#8D97A1; --clay:#C8B3A4;
+      --shadow:0 14px 36px rgba(31,35,40,.08); --shadow2:0 10px 22px rgba(31,35,40,.06);
+      --radius:22px; --radius2:18px;
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+      color:var(--ink);background:var(--bg);letter-spacing:.1px}
+    .wrap{max-width:1120px;margin:0 auto;padding:28px 16px 56px}
+    .hero{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 22px 18px}
+    .heroTop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+    h1{margin:0;font-size:clamp(22px,2.5vw,34px);font-weight:900}
+    .sub{margin-top:10px;color:var(--muted);line-height:1.7;font-size:14px;max-width:860px}
+    .quoteRow{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+    .chip{border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:8px 12px;font-size:12px;color:rgba(31,35,40,.78)}
+    .heroActions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+    button{font:inherit;cursor:pointer}
+    .btn{border:1px solid var(--line);background:rgba(255,255,255,.85);padding:10px 12px;border-radius:14px;transition:transform .05s ease,background .15s ease,border-color .15s ease;
+      display:inline-flex;align-items:center;gap:8px;user-select:none}
+    .btn:hover{background:#fff;border-color:rgba(31,35,40,.16)} .btn:active{transform:translateY(1px)}
+    .btn.primary{background:rgba(199,165,169,.18);border-color:rgba(199,165,169,.35)}
+    .btn.sage{background:rgba(174,185,173,.20);border-color:rgba(174,185,173,.40)}
+    .btn.danger{background:rgba(255,255,255,.85);border-color:rgba(170,70,70,.25);color:rgba(140,40,40,.95)}
+    .grid{margin-top:18px;display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:980px){.grid{grid-template-columns:1.55fr 1fr}}
+    .panel{background:rgba(255,255,255,.80);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow2);overflow:hidden}
+    .panelHead{padding:16px 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .panelTitle{margin:0;font-size:16px;font-weight:900}
+    .panelDesc{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .tab{border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:7px 10px;font-size:12px;color:rgba(31,35,40,.78);cursor:pointer;user-select:none}
+    .tab.active{background:rgba(141,151,161,.14);border-color:rgba(141,151,161,.35);color:rgba(31,35,40,.88)}
+    .searchRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center}
+    .field{border:1px solid var(--line);background:rgba(255,255,255,.92);padding:10px 12px;border-radius:14px;outline:none;min-width:240px;flex:1}
+    .field:focus{border-color:rgba(141,151,161,.55)}
+    .content{padding:14px}
+    .cards{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:640px){.cards{grid-template-columns:1fr 1fr}}
+    .card{border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:var(--radius2);overflow:hidden;display:flex;flex-direction:column;min-height:290px}
+    .thumb{height:150px;background:linear-gradient(135deg,rgba(199,165,169,.18),rgba(174,185,173,.16));position:relative;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb .thumbHint{position:absolute;inset:auto 10px 10px 10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+    .pill{border:1px solid rgba(31,35,40,.10);background:rgba(255,255,255,.72);border-radius:999px;padding:6px 9px;font-size:12px;color:rgba(31,35,40,.78);
+      backdrop-filter:blur(6px);max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .cardBody{padding:12px 12px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .name{margin:0;font-weight:900;font-size:15px}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .badge,.price{font-size:12px;padding:5px 9px;border-radius:999px;border:1px solid rgba(31,35,40,.10);background:rgba(255,255,255,.72);color:rgba(31,35,40,.74)}
+    .price{color:rgba(31,35,40,.78)}
+    .note{width:100%;min-height:72px;resize:vertical;border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:14px;padding:10px 12px;outline:none;line-height:1.55;color:rgba(31,35,40,.88)}
+    .note:focus{border-color:rgba(141,151,161,.55)}
+    .btnRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+    .selectRow{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .toggle{display:flex;align-items:center;gap:8px;user-select:none;font-size:13px;color:rgba(31,35,40,.82)}
+    input[type="checkbox"]{width:18px;height:18px;accent-color:var(--pink)}
+    .summary{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .summaryBox{border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:var(--radius2);padding:12px}
+    .summaryTitle{margin:0 0 6px;font-weight:900;font-size:14px}
+    .summaryList{margin:0;padding-left:18px;color:rgba(31,35,40,.86);line-height:1.65;font-size:13px}
+    .small{color:var(--muted);font-size:12px;line-height:1.6}
+    .cta{padding:14px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:rgba(255,255,255,.78)}
+    .ctaMain{display:flex;flex-direction:column;gap:4px}
+    .ctaBig{font-weight:900;font-size:14px}
+    .btn.big{padding:12px 14px;border-radius:16px}
+    .toast{position:fixed;right:16px;bottom:16px;width:min(380px,calc(100vw - 32px));background:rgba(255,255,255,.92);
+      border:1px solid rgba(31,35,40,.10);border-radius:16px;box-shadow:var(--shadow);padding:12px;display:none;gap:8px;align-items:flex-start}
+    .toast.show{display:flex} .toast b{font-size:13px}
+    .toast .t{font-size:12px;color:var(--muted);line-height:1.6;margin-top:2px}
+    .modal{position:fixed;inset:0;background:rgba(31,35,40,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:999}
+    .modal.show{display:flex}
+    .modalCard{width:min(720px,100%);border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.20);
+      box-shadow:0 24px 70px rgba(0,0,0,.25);overflow:hidden}
+    .modalHead{padding:12px;border-bottom:1px solid rgba(31,35,40,.10);display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .modalHead .title{font-weight:900;font-size:13px;color:rgba(31,35,40,.85);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:70%}
+    .modalBody{padding:12px;display:flex;flex-direction:column;gap:10px}
+    .formGrid{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:560px){.formGrid{grid-template-columns:1fr 1fr}}
+    .label{font-size:12px;color:rgba(31,35,40,.72);margin-bottom:6px}
+    .control{display:flex;flex-direction:column;gap:6px}
+    .select{border:1px solid var(--line);background:rgba(255,255,255,.92);padding:10px 12px;border-radius:14px;outline:none}
+    .imgModalBody{padding:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.78)}
+    .imgModalBody img{max-width:100%;max-height:78vh;border-radius:16px;display:block}
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center;line-height:1.7;padding:10px 0}
   </style>
 </head>
 
@@ -552,10 +107,10 @@
             <div>“点击确认下单，爱情即刻送达。”</div>
           </div>
           <div class="quoteRow">
-            <span class="chip">💾 文案/选择 自动保存（LocalStorage）</span>
+            <span class="chip">💾 自动保存（LocalStorage）</span>
             <span class="chip">📷 高清原图 IndexedDB（不卡、不丢）</span>
             <span class="chip">📩 下单邮件通知（Formspree）</span>
-            <span class="chip">🧁 极简莫兰迪 + 大留白</span>
+            <span class="chip">🧁 极简莫兰迪 + 留白</span>
           </div>
         </div>
 
@@ -571,12 +126,11 @@
     </section>
 
     <div class="grid">
-      <!-- Left: Menu -->
       <section class="panel">
         <div class="panelHead">
           <div>
             <h2 class="panelTitle">三合一菜单（中 / 韩 / 西）</h2>
-            <div class="panelDesc">共 50 道预设菜品，你也可以自由增删改；每张卡支持上传照片（高清存本地）。</div>
+            <div class="panelDesc">共 50 道预设菜品；每张卡支持编辑/删除/勾选下单/上传高清图。</div>
 
             <div class="tabs" id="tabs"></div>
 
@@ -592,12 +146,11 @@
         </div>
       </section>
 
-      <!-- Right: Wishlist + Order -->
       <section class="panel">
         <div class="panelHead">
           <div>
             <h2 class="panelTitle">心愿清单</h2>
-            <div class="panelDesc">写下想要的礼物/小愿望，实时添加成卡片。胖欣欣：收到✅</div>
+            <div class="panelDesc">写下想要的礼物/小愿望，实时添加成卡片。</div>
           </div>
         </div>
 
@@ -608,7 +161,7 @@
         <div class="cta">
           <div class="ctaMain">
             <div class="ctaBig">确认订单</div>
-            <div class="small">会保存到本地，并通过 Formspree 发送邮件通知（需要你填 endpoint）。</div>
+            <div class="small">会保存到本地，并通过 Formspree 发送邮件通知。</div>
           </div>
           <button class="btn primary big" id="btnConfirm">确认下单 · 爱情送达</button>
         </div>
@@ -623,18 +176,17 @@
           <div class="summaryBox">
             <p class="summaryTitle">心愿清单</p>
             <ol class="summaryList" id="wishSummary"></ol>
-            <div class="small" id="wishEmpty">（还没写心愿，快写一个让胖欣欣紧张一下。）</div>
+            <div class="small" id="wishEmpty">（还没写心愿，快写一个～）</div>
           </div>
 
           <div class="summaryBox">
             <p class="summaryTitle">邮件通知设置</p>
             <div class="small">
-              1) 去 Formspree 创建表单拿到 endpoint（形如 https://formspree.io/f/xxxxxx）。<br/>
-              2) 把下面输入框填好；下单会把订单信息发到你 Formspree 绑定的邮箱。<br/>
-              3) 如果你想“发到指定邮箱”，在 Formspree 后台把转发邮箱设置成你指定的那个。
+              Formspree endpoint 已为你预填：<b>xpqjqdnd</b>。<br/>
+              你只要在 Formspree 后台把接收邮箱设成你的邮箱即可。
             </div>
             <div style="height:10px"></div>
-            <input class="field" id="formspreeEndpoint" placeholder="Formspree Endpoint：例如 https://formspree.io/f/xxxxxx" />
+            <input class="field" id="formspreeEndpoint" placeholder="Formspree Endpoint" />
             <div style="height:10px"></div>
             <input class="field" id="yourEmailHint" placeholder="你的邮箱（仅作为订单内容字段，可不填）" />
           </div>
@@ -644,11 +196,10 @@
 
     <footer>
       GitHub Pages：把本文件命名为 <b>index.html</b> 放到仓库根目录 → Settings → Pages → 选择分支部署。<br/>
-      本页面不需要后端；图片高清原图存 IndexedDB、缩略图/文本/选择存 LocalStorage。
+      高清原图存 IndexedDB；缩略图/文本/选择存 LocalStorage。
     </footer>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast">
     <div style="font-size:16px;line-height:1">✨</div>
     <div>
@@ -657,7 +208,6 @@
     </div>
   </div>
 
-  <!-- Modal: Add/Edit Dish -->
   <div class="modal" id="dishModal">
     <div class="modalCard">
       <div class="modalHead">
@@ -700,7 +250,6 @@
     </div>
   </div>
 
-  <!-- Modal: Add/Edit Wish -->
   <div class="modal" id="wishModal">
     <div class="modalCard">
       <div class="modalHead">
@@ -724,7 +273,6 @@
     </div>
   </div>
 
-  <!-- Modal: Full Image Preview -->
   <div class="modal" id="imgModal">
     <div class="modalCard" style="width:min(980px,100%)">
       <div class="modalHead">
@@ -738,2720 +286,548 @@
   </div>
 
   <script>
-    /*****************************************************************
-     * Core requirements
-     * - 50 preset dishes (Chinese/Korean/Western) with categories
-     * - CRUD: dish cards have Edit/Delete, plus global "新增菜品"
-     * - Wishlist: dynamic add/edit/delete
-     * - Auto-save: LocalStorage for text/selection/thumbs
-     * - HD photo storage: IndexedDB for original blobs; thumbnails in LS
-     * - Confirm order: save to local AND send email via Formspree endpoint
-     *****************************************************************/
+    // === Pre-fill Formspree endpoint (your provided) ===
+    const DEFAULT_FORMSPREE_ENDPOINT = "https://formspree.io/f/xpqjqdnd";
 
-    // ===== Storage Keys =====
-    const LS_DISHES = "pxxy_dishes_v3";
-    const LS_WISHES = "pxxy_wishes_v3";
-    const LS_SETTINGS = "pxxy_settings_v3";
-    const LS_ORDERS = "pxxy_orders_v3";
+    const LS_DISHES="pxxy_dishes_v3", LS_WISHES="pxxy_wishes_v3", LS_SETTINGS="pxxy_settings_v3", LS_ORDERS="pxxy_orders_v3";
+    const DB_NAME="pxxy_images_db_v3", STORE="images";
 
-    // IndexedDB
-    const DB_NAME = "pxxy_images_db_v3";
-    const STORE = "images";
+    let dishes=[], wishes=[], filterCuisine="全部", searchQuery="";
+    let editingDishId=null, editingWishId=null;
 
-    // ===== State =====
-    let dishes = [];
-    let wishes = [];
-    let filterCuisine = "全部";
-    let searchQuery = "";
+    const tabsEl=document.getElementById("tabs");
+    const searchEl=document.getElementById("search");
+    const dishGrid=document.getElementById("dishGrid");
+    const wishGrid=document.getElementById("wishGrid");
 
-    // Modal editing
-    let editingDishId = null;
-    let editingWishId = null;
+    const selectedList=document.getElementById("selectedList");
+    const selectedEmpty=document.getElementById("selectedEmpty");
+    const wishSummary=document.getElementById("wishSummary");
+    const wishEmpty=document.getElementById("wishEmpty");
 
-    // ===== DOM =====
-    const tabsEl = document.getElementById("tabs");
-    const searchEl = document.getElementById("search");
-    const dishGrid = document.getElementById("dishGrid");
-    const wishGrid = document.getElementById("wishGrid");
+    const endpointEl=document.getElementById("formspreeEndpoint");
+    const emailHintEl=document.getElementById("yourEmailHint");
 
-    const selectedList = document.getElementById("selectedList");
-    const selectedEmpty = document.getElementById("selectedEmpty");
-    const wishSummary = document.getElementById("wishSummary");
-    const wishEmpty = document.getElementById("wishEmpty");
+    const toast=document.getElementById("toast");
+    const toastTitle=document.getElementById("toastTitle");
+    const toastMsg=document.getElementById("toastMsg");
+    let toastTimer=null;
 
-    const endpointEl = document.getElementById("formspreeEndpoint");
-    const emailHintEl = document.getElementById("yourEmailHint");
+    const dishModal=document.getElementById("dishModal");
+    const dishModalTitle=document.getElementById("dishModalTitle");
+    const dishName=document.getElementById("dishName");
+    const dishCuisine=document.getElementById("dishCuisine");
+    const dishTags=document.getElementById("dishTags");
+    const dishPrice=document.getElementById("dishPrice");
+    const dishNote=document.getElementById("dishNote");
 
-    // Toast
-    const toast = document.getElementById("toast");
-    const toastTitle = document.getElementById("toastTitle");
-    const toastMsg = document.getElementById("toastMsg");
-    let toastTimer = null;
+    const wishModal=document.getElementById("wishModal");
+    const wishModalTitle=document.getElementById("wishModalTitle");
+    const wishTitleInput=document.getElementById("wishTitleInput");
+    const wishDescInput=document.getElementById("wishDescInput");
 
-    // Modals
-    const dishModal = document.getElementById("dishModal");
-    const dishModalTitle = document.getElementById("dishModalTitle");
-    const dishName = document.getElementById("dishName");
-    const dishCuisine = document.getElementById("dishCuisine");
-    const dishTags = document.getElementById("dishTags");
-    const dishPrice = document.getElementById("dishPrice");
-    const dishNote = document.getElementById("dishNote");
+    const imgModal=document.getElementById("imgModal");
+    const imgModalTitle=document.getElementById("imgModalTitle");
+    const imgModalImg=document.getElementById("imgModalImg");
 
-    const wishModal = document.getElementById("wishModal");
-    const wishModalTitle = document.getElementById("wishModalTitle");
-    const wishTitleInput = document.getElementById("wishTitleInput");
-    const wishDescInput = document.getElementById("wishDescInput");
-
-    const imgModal = document.getElementById("imgModal");
-    const imgModalTitle = document.getElementById("imgModalTitle");
-    const imgModalImg = document.getElementById("imgModalImg");
-
-    // ===== Init =====
+    // Init
     loadAll();
     renderAll();
 
-    // ===== Event bindings =====
-    document.getElementById("btnAddDish").addEventListener("click", () => openDishModal(null));
-    document.getElementById("btnAddWish").addEventListener("click", () => openWishModal(null));
+    document.getElementById("btnAddDish").addEventListener("click",()=>openDishModal(null));
+    document.getElementById("btnAddWish").addEventListener("click",()=>openWishModal(null));
 
-    document.getElementById("btnClearSearch").addEventListener("click", () => {
-      searchQuery = "";
-      searchEl.value = "";
-      renderAll();
-    });
+    document.getElementById("btnClearSearch").addEventListener("click",()=>{searchQuery="";searchEl.value="";renderAll();});
+    searchEl.addEventListener("input",debounce(()=>{searchQuery=(searchEl.value||"").trim();renderAll();},120));
 
-    searchEl.addEventListener("input", debounce(() => {
-      searchQuery = (searchEl.value || "").trim();
-      renderAll();
-    }, 120));
-
-    // Export / Import
-    const importFile = document.getElementById("importFile");
-    document.getElementById("btnImport").addEventListener("click", () => importFile.click());
-    importFile.addEventListener("change", async () => {
-      const f = importFile.files && importFile.files[0];
-      if (!f) return;
+    const importFile=document.getElementById("importFile");
+    document.getElementById("btnImport").addEventListener("click",()=>importFile.click());
+    importFile.addEventListener("change",async()=>{
+      const f=importFile.files&&importFile.files[0]; if(!f) return;
       try{
-        const data = JSON.parse(await f.text());
-        if (!data || typeof data !== "object") throw new Error("JSON 无效");
-
-        dishes = Array.isArray(data.dishes) ? data.dishes : dishes;
-        wishes = Array.isArray(data.wishes) ? data.wishes : wishes;
-
-        saveLS(LS_DISHES, dishes);
-        saveLS(LS_WISHES, wishes);
-
-        // settings optional
-        if (data.settings && typeof data.settings === "object") {
-          saveLS(LS_SETTINGS, data.settings);
-          applySettingsFromLS();
-        }
-
-        renderAll();
-        showToast("导入成功", "文本/选择/缩略图已恢复。原图仍在 IndexedDB（若换设备需重新上传）。");
-      }catch(e){
-        showToast("导入失败", e?.message || String(e));
-      }finally{
-        importFile.value = "";
-      }
+        const data=JSON.parse(await f.text());
+        dishes=Array.isArray(data.dishes)?data.dishes:dishes;
+        wishes=Array.isArray(data.wishes)?data.wishes:wishes;
+        saveLS(LS_DISHES,dishes); saveLS(LS_WISHES,wishes);
+        if(data.settings&&typeof data.settings==="object"){saveLS(LS_SETTINGS,data.settings);applySettingsFromLS();}
+        renderAll(); showToast("导入成功","文本/选择/缩略图已恢复。");
+      }catch(e){showToast("导入失败",e?.message||String(e));}
+      finally{importFile.value="";}
     });
 
-    document.getElementById("btnExport").addEventListener("click", () => {
-      const payload = {
-        version: 3,
-        exportedAt: Date.now(),
-        dishes,
-        wishes,
-        settings: loadLS(LS_SETTINGS) || {},
-        note: "原图高清存 IndexedDB，不在 JSON 内；JSON 内只包含缩略图 dataURL。"
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "胖欣欣_瘦媛媛_情人节_数据.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast("已导出", "JSON 已下载（原图不包含在内）。");
+    document.getElementById("btnExport").addEventListener("click",()=>{
+      const payload={version:3,exportedAt:Date.now(),dishes,wishes,settings:loadLS(LS_SETTINGS)||{},note:"原图高清存 IndexedDB，不在 JSON 内；JSON 内只包含缩略图 dataURL。"};
+      const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a"); a.href=url; a.download="胖欣欣_瘦媛媛_情人节_数据.json";
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      showToast("已导出","JSON 已下载（原图不包含在内）。");
     });
 
-    document.getElementById("btnReset").addEventListener("click", async () => {
-      if (!confirm("确定清空所有数据吗？（LocalStorage + IndexedDB 图片）")) return;
-      localStorage.removeItem(LS_DISHES);
-      localStorage.removeItem(LS_WISHES);
-      localStorage.removeItem(LS_SETTINGS);
-      localStorage.removeItem(LS_ORDERS);
-      dishes = [];
-      wishes = [];
-      await idbClearAll();
-      loadAll(); // rehydrate presets
-      renderAll();
-      showToast("已清空", "已恢复到默认 50 道菜（图片已清空）。");
+    document.getElementById("btnReset").addEventListener("click",async()=>{
+      if(!confirm("确定清空所有数据吗？（LocalStorage + IndexedDB 图片）"))return;
+      localStorage.removeItem(LS_DISHES);localStorage.removeItem(LS_WISHES);localStorage.removeItem(LS_SETTINGS);localStorage.removeItem(LS_ORDERS);
+      dishes=[];wishes=[];await idbClearAll();loadAll();renderAll();
+      showToast("已清空","已恢复到默认 50 道菜（图片已清空）。");
     });
 
-    // Settings autosave
-    endpointEl.addEventListener("input", debounce(saveSettings, 200));
-    emailHintEl.addEventListener("input", debounce(saveSettings, 200));
+    endpointEl.addEventListener("input",debounce(saveSettings,200));
+    emailHintEl.addEventListener("input",debounce(saveSettings,200));
+    document.getElementById("btnConfirm").addEventListener("click",confirmOrder);
 
-    // Confirm order
-    document.getElementById("btnConfirm").addEventListener("click", confirmOrder);
+    document.getElementById("dishModalClose").addEventListener("click",closeDishModal);
+    document.getElementById("dishCancel").addEventListener("click",closeDishModal);
+    document.getElementById("dishSave").addEventListener("click",saveDishFromModal);
+    dishModal.addEventListener("click",(e)=>{if(e.target===dishModal)closeDishModal();});
 
-    // Dish modal
-    document.getElementById("dishModalClose").addEventListener("click", closeDishModal);
-    document.getElementById("dishCancel").addEventListener("click", closeDishModal);
-    document.getElementById("dishSave").addEventListener("click", saveDishFromModal);
-    dishModal.addEventListener("click", (e) => { if (e.target === dishModal) closeDishModal(); });
+    document.getElementById("wishModalClose").addEventListener("click",closeWishModal);
+    document.getElementById("wishCancel").addEventListener("click",closeWishModal);
+    document.getElementById("wishSave").addEventListener("click",saveWishFromModal);
+    wishModal.addEventListener("click",(e)=>{if(e.target===wishModal)closeWishModal();});
 
-    // Wish modal
-    document.getElementById("wishModalClose").addEventListener("click", closeWishModal);
-    document.getElementById("wishCancel").addEventListener("click", closeWishModal);
-    document.getElementById("wishSave").addEventListener("click", saveWishFromModal);
-    wishModal.addEventListener("click", (e) => { if (e.target === wishModal) closeWishModal(); });
+    document.getElementById("imgModalClose").addEventListener("click",closeImgModal);
+    imgModal.addEventListener("click",(e)=>{if(e.target===imgModal)closeImgModal();});
+    document.addEventListener("keydown",(e)=>{if(e.key==="Escape"){closeDishModal();closeWishModal();closeImgModal();}});
 
-    // Image modal
-    document.getElementById("imgModalClose").addEventListener("click", closeImgModal);
-    imgModal.addEventListener("click", (e) => { if (e.target === imgModal) closeImgModal(); });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape"){
-        closeDishModal();
-        closeWishModal();
-        closeImgModal();
-      }
-    });
-
-    // ===== Data bootstrap =====
     function loadAll(){
-      // Dishes
-      const lsD = loadLS(LS_DISHES);
-      if (Array.isArray(lsD) && lsD.length){
-        dishes = lsD;
-      }else{
-        dishes = makePresetDishes50();
-        saveLS(LS_DISHES, dishes);
-      }
-
-      // Wishes
-      const lsW = loadLS(LS_WISHES);
-      wishes = Array.isArray(lsW) ? lsW : [];
-      if (!Array.isArray(lsW)) saveLS(LS_WISHES, wishes);
-
+      const lsD=loadLS(LS_DISHES);
+      if(Array.isArray(lsD)&&lsD.length){dishes=lsD;}else{dishes=makePresetDishes50();saveLS(LS_DISHES,dishes);}
+      const lsW=loadLS(LS_WISHES); wishes=Array.isArray(lsW)?lsW:[]; if(!Array.isArray(lsW))saveLS(LS_WISHES,wishes);
       applySettingsFromLS();
     }
 
     function applySettingsFromLS(){
-      const s = loadLS(LS_SETTINGS) || {};
-      endpointEl.value = s.formspreeEndpoint || "";
+      const s=loadLS(LS_SETTINGS)||{};
+      endpointEl.value = s.formspreeEndpoint || DEFAULT_FORMSPREE_ENDPOINT;
       emailHintEl.value = s.yourEmailHint || "";
+      // If user never saved settings before, persist the default endpoint once
+      if (!s.formspreeEndpoint) saveSettings();
     }
 
     function saveSettings(){
-      saveLS(LS_SETTINGS, {
-        formspreeEndpoint: (endpointEl.value || "").trim(),
-        yourEmailHint: (emailHintEl.value || "").trim()
+      saveLS(LS_SETTINGS,{
+        formspreeEndpoint:(endpointEl.value||"").trim() || DEFAULT_FORMSPREE_ENDPOINT,
+        yourEmailHint:(emailHintEl.value||"").trim()
       });
     }
 
     function makePresetDishes50(){
-      // 50 items: 中餐 20 / 韩餐 15 / 西餐 15
-      const base = [
-        // 中餐 20
-        ["中餐","红烧肉","家常/下饭","58"],
-        ["中餐","宫保鸡丁","微辣/经典","42"],
-        ["中餐","水煮牛肉","重辣/过瘾","68"],
-        ["中餐","酸菜鱼","酸爽/暖胃","66"],
-        ["中餐","麻婆豆腐","麻辣/拌饭","32"],
-        ["中餐","小炒黄牛肉","香辣/爆炒","62"],
-        ["中餐","糖醋里脊","酸甜/开胃","48"],
-        ["中餐","葱爆羊肉","葱香/下酒","72"],
-        ["中餐","清蒸鲈鱼","清爽/鲜","78"],
-        ["中餐","虾仁滑蛋","软嫩/治愈","45"],
-        ["中餐","番茄牛腩","浓郁/汤汁","74"],
-        ["中餐","烤鸭卷","仪式感","88"],
-        ["中餐","蒜蓉粉丝蒸扇贝","蒜香/海味","76"],
-        ["中餐","担担面","微麻/香","28"],
-        ["中餐","牛肉面（红烧）","暖胃/饱足","32"],
-        ["中餐","酸辣汤","开胃/热乎","22"],
-        ["中餐","蛋炒饭","经典/不踩雷","18"],
-        ["中餐","锅包肉","外酥里嫩","52"],
-        ["中餐","椒盐排骨","酥香/咸香","58"],
-        ["中餐","双皮奶","甜品/温柔","20"],
+      const base=[
+        ["中餐","红烧肉","家常/下饭","58"],["中餐","宫保鸡丁","微辣/经典","42"],["中餐","水煮牛肉","重辣/过瘾","68"],
+        ["中餐","酸菜鱼","酸爽/暖胃","66"],["中餐","麻婆豆腐","麻辣/拌饭","32"],["中餐","小炒黄牛肉","香辣/爆炒","62"],
+        ["中餐","糖醋里脊","酸甜/开胃","48"],["中餐","葱爆羊肉","葱香/下酒","72"],["中餐","清蒸鲈鱼","清爽/鲜","78"],
+        ["中餐","虾仁滑蛋","软嫩/治愈","45"],["中餐","番茄牛腩","浓郁/汤汁","74"],["中餐","烤鸭卷","仪式感","88"],
+        ["中餐","蒜蓉粉丝蒸扇贝","蒜香/海味","76"],["中餐","担担面","微麻/香","28"],["中餐","牛肉面（红烧）","暖胃/饱足","32"],
+        ["中餐","酸辣汤","开胃/热乎","22"],["中餐","蛋炒饭","经典/不踩雷","18"],["中餐","锅包肉","外酥里嫩","52"],
+        ["中餐","椒盐排骨","酥香/咸香","58"],["中餐","双皮奶","甜品/温柔","20"],
 
-        // 韩餐 15
-        ["韩餐","部队锅","浓郁/热辣","72"],
-        ["韩餐","泡菜炒饭","酸辣/香","36"],
-        ["韩餐","韩式炸鸡","酥脆/甜辣","56"],
-        ["韩餐","石锅拌饭","均衡/满足","48"],
-        ["韩餐","参鸡汤","滋补/暖","88"],
-        ["韩餐","海鲜豆腐汤","鲜辣/热乎","46"],
-        ["韩餐","芝士年糕","拉丝/罪恶","44"],
-        ["韩餐","烤五花肉","香/满足","68"],
-        ["韩餐","烤牛小排","高级/香","98"],
-        ["韩餐","冷面","清爽/解腻","34"],
-        ["韩餐","辣炒鱿鱼","香辣/下饭","58"],
-        ["韩餐","紫菜包饭","清爽/方便","28"],
-        ["韩餐","泡菜饼","外脆/酸香","32"],
-        ["韩餐","蜂蜜柚子茶","清甜","16"],
-        ["韩餐","草莓牛奶","甜甜","18"],
+        ["韩餐","部队锅","浓郁/热辣","72"],["韩餐","泡菜炒饭","酸辣/香","36"],["韩餐","韩式炸鸡","酥脆/甜辣","56"],
+        ["韩餐","石锅拌饭","均衡/满足","48"],["韩餐","参鸡汤","滋补/暖","88"],["韩餐","海鲜豆腐汤","鲜辣/热乎","46"],
+        ["韩餐","芝士年糕","拉丝/罪恶","44"],["韩餐","烤五花肉","香/满足","68"],["韩餐","烤牛小排","高级/香","98"],
+        ["韩餐","冷面","清爽/解腻","34"],["韩餐","辣炒鱿鱼","香辣/下饭","58"],["韩餐","紫菜包饭","清爽/方便","28"],
+        ["韩餐","泡菜饼","外脆/酸香","32"],["韩餐","蜂蜜柚子茶","清甜","16"],["韩餐","草莓牛奶","甜甜","18"],
 
-        // 西餐 15
-        ["西餐","黑椒牛排","高级/满足","128"],
-        ["西餐","奶油蘑菇意面","治愈/温柔","68"],
-        ["西餐","番茄海鲜意面","鲜/酸甜","76"],
-        ["西餐","凯撒沙拉","清爽/轻盈","42"],
-        ["西餐","烤三文鱼","清爽/鲜","118"],
-        ["西餐","烤鸡腿配土豆","家常/香","88"],
-        ["西餐","蘑菇浓汤","暖胃","36"],
-        ["西餐","法式洋葱汤","层次/香","46"],
-        ["西餐","芝士披萨","拉丝/快乐","78"],
-        ["西餐","玛格丽特披萨","经典","72"],
-        ["西餐","提拉米苏","甜品/氛围","38"],
-        ["西餐","草莓奶油蛋糕","甜/浪漫","42"],
-        ["西餐","焦糖布丁","丝滑","28"],
-        ["西餐","无酒精起泡酒","仪式感","26"],
-        ["西餐","热可可","暖心","18"],
+        ["西餐","黑椒牛排","高级/满足","128"],["西餐","奶油蘑菇意面","治愈/温柔","68"],["西餐","番茄海鲜意面","鲜/酸甜","76"],
+        ["西餐","凯撒沙拉","清爽/轻盈","42"],["西餐","烤三文鱼","清爽/鲜","118"],["西餐","烤鸡腿配土豆","家常/香","88"],
+        ["西餐","蘑菇浓汤","暖胃","36"],["西餐","法式洋葱汤","层次/香","46"],["西餐","芝士披萨","拉丝/快乐","78"],
+        ["西餐","玛格丽特披萨","经典","72"],["西餐","提拉米苏","甜品/氛围","38"],["西餐","草莓奶油蛋糕","甜/浪漫","42"],
+        ["西餐","焦糖布丁","丝滑","28"],["西餐","无酒精起泡酒","仪式感","26"],["西餐","热可可","暖心","18"],
       ];
-
-      return base.map(([cuisine, name, tags, price], idx) => ({
-        id: crypto.randomUUID(),
-        cuisine,
-        name,
-        tags,
-        price,
-        note: "",
-        selected: false,
-        thumbDataUrl: null,     // small thumb stored in LS
-        imageBlobKey: null,     // full-res blob stored in IndexedDB
-        updatedAt: Date.now() - (base.length - idx) * 1000
+      return base.map(([cuisine,name,tags,price],idx)=>({
+        id:crypto.randomUUID(),cuisine,name,tags,price,note:"",selected:false,thumbDataUrl:null,imageBlobKey:null,updatedAt:Date.now()-(base.length-idx)*1000
       }));
     }
 
-    // ===== Render =====
-    function renderAll(){
-      renderTabs();
-      renderDishes();
-      renderWishes();
-      renderSummary();
-      saveSettings(); // keep latest
-    }
+    function renderAll(){ renderTabs(); renderDishes(); renderWishes(); renderSummary(); saveSettings(); }
 
     function renderTabs(){
-      const allCount = dishes.length;
-      const cn = dishes.filter(d => d.cuisine==="中餐").length;
-      const kr = dishes.filter(d => d.cuisine==="韩餐").length;
-      const we = dishes.filter(d => d.cuisine==="西餐").length;
-
-      const tabs = [
-        ["全部", `全部 (${allCount})`],
-        ["中餐", `中餐 (${cn})`],
-        ["韩餐", `韩餐 (${kr})`],
-        ["西餐", `西餐 (${we})`]
-      ];
-
-      tabsEl.innerHTML = "";
-      tabs.forEach(([key, label]) => {
-        const t = document.createElement("div");
-        t.className = "tab" + (filterCuisine===key ? " active" : "");
-        t.textContent = label;
-        t.addEventListener("click", () => {
-          filterCuisine = key;
-          renderAll();
-        });
-        tabsEl.appendChild(t);
+      const all=dishes.length, cn=dishes.filter(d=>d.cuisine==="中餐").length, kr=dishes.filter(d=>d.cuisine==="韩餐").length, we=dishes.filter(d=>d.cuisine==="西餐").length;
+      const tabs=[["全部",`全部 (${all})`],["中餐",`中餐 (${cn})`],["韩餐",`韩餐 (${kr})`],["西餐",`西餐 (${we})`]];
+      tabsEl.innerHTML="";
+      tabs.forEach(([key,label])=>{
+        const t=document.createElement("div"); t.className="tab"+(filterCuisine===key?" active":""); t.textContent=label;
+        t.addEventListener("click",()=>{filterCuisine=key;renderAll();}); tabsEl.appendChild(t);
       });
     }
 
     function renderDishes(){
-      const q = searchQuery.toLowerCase();
-      const list = dishes.filter(d => {
-        if (filterCuisine !== "全部" && d.cuisine !== filterCuisine) return false;
-        if (!q) return true;
-        return (d.name + " " + (d.tags||"") + " " + (d.note||"")).toLowerCase().includes(q);
+      const q=searchQuery.toLowerCase();
+      const list=dishes.filter(d=>{
+        if(filterCuisine!=="全部"&&d.cuisine!==filterCuisine)return false;
+        if(!q)return true;
+        return (d.name+" "+(d.tags||"")+" "+(d.note||"")).toLowerCase().includes(q);
       });
-
-      dishGrid.innerHTML = "";
-      if (!list.length){
-        dishGrid.innerHTML = `<div class="small">没有匹配结果～（要不换个关键词？）</div>`;
-        return;
-      }
-
-      for (const dish of list){
-        dishGrid.appendChild(renderDishCard(dish));
-      }
+      dishGrid.innerHTML="";
+      if(!list.length){dishGrid.innerHTML=`<div class="small">没有匹配结果～</div>`;return;}
+      for(const d of list) dishGrid.appendChild(renderDishCard(d));
     }
 
     function renderDishCard(d){
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const thumb = document.createElement("div");
-      thumb.className = "thumb";
-      const img = document.createElement("img");
-      img.loading = "lazy";
-      img.decoding = "async";
-
-      if (d.thumbDataUrl){
-        img.src = d.thumbDataUrl;
-      }else{
-        img.style.opacity = "0";
-      }
-
+      const card=document.createElement("div"); card.className="card";
+      const thumb=document.createElement("div"); thumb.className="thumb";
+      const img=document.createElement("img"); img.loading="lazy"; img.decoding="async";
+      if(d.thumbDataUrl){img.src=d.thumbDataUrl;} else {img.style.opacity="0";}
       thumb.appendChild(img);
 
-      const hint = document.createElement("div");
-      hint.className = "thumbHint";
-      const p1 = document.createElement("div");
-      p1.className = "pill";
-      p1.textContent = d.thumbDataUrl ? "点我看高清 / 换图" : "上传照片（高清）";
-      const p2 = document.createElement("div");
-      p2.className = "pill";
-      p2.textContent = d.cuisine;
-      hint.append(p1, p2);
-      thumb.appendChild(hint);
+      const hint=document.createElement("div"); hint.className="thumbHint";
+      const p1=document.createElement("div"); p1.className="pill"; p1.textContent=d.thumbDataUrl?"点我看高清 / 换图":"上传照片（高清）";
+      const p2=document.createElement("div"); p2.className="pill"; p2.textContent=d.cuisine;
+      hint.append(p1,p2); thumb.appendChild(hint);
 
-      const body = document.createElement("div");
-      body.className = "cardBody";
+      const body=document.createElement("div"); body.className="cardBody";
+      const top=document.createElement("div"); top.className="row";
+      const name=document.createElement("p"); name.className="name"; name.textContent=d.name;
 
-      const top = document.createElement("div");
-      top.className = "row";
-      const name = document.createElement("p");
-      name.className = "name";
-      name.textContent = d.name;
+      const meta=document.createElement("div"); meta.className="meta";
+      const b1=document.createElement("span"); b1.className="badge"; b1.textContent=d.tags||"—";
+      const b2=document.createElement("span"); b2.className="price"; b2.textContent=d.price?("¥ "+d.price):"¥ —";
+      meta.append(b1,b2); top.append(name,meta);
 
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      const b1 = document.createElement("span");
-      b1.className = "badge";
-      b1.textContent = d.tags || "—";
-      const b2 = document.createElement("span");
-      b2.className = "price";
-      b2.textContent = d.price ? "¥ " + d.price : "¥ —";
-      meta.append(b1, b2);
+      const note=document.createElement("textarea"); note.className="note";
+      note.placeholder="写点可爱备注：不要香菜/要加辣/瘦媛媛说这道必须点…";
+      note.value=d.note||"";
 
-      top.append(name, meta);
-
-      const note = document.createElement("textarea");
-      note.className = "note";
-      note.placeholder = "写点可爱备注：不要香菜/要加辣/瘦媛媛说这道必须点…";
-      note.value = d.note || "";
-
-      const selectRow = document.createElement("div");
-      selectRow.className = "selectRow";
-      const toggle = document.createElement("label");
-      toggle.className = "toggle";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = !!d.selected;
-      const span = document.createElement("span");
-      span.textContent = d.selected ? "已选中（胖欣欣准备清盘）" : "加入订单";
-      toggle.append(cb, span);
-
-      cb.addEventListener("change", () => {
-        d.selected = cb.checked;
-        span.textContent = d.selected ? "已选中（胖欣欣准备清盘）" : "加入订单";
-        d.updatedAt = Date.now();
-        saveLS(LS_DISHES, dishes);
-        renderSummary();
-      });
-
-      // Buttons
-      const btnRow = document.createElement("div");
-      btnRow.className = "btnRow";
-      const btnEdit = document.createElement("button");
-      btnEdit.className = "btn";
-      btnEdit.textContent = "编辑";
-      btnEdit.addEventListener("click", () => openDishModal(d.id));
-
-      const btnDel = document.createElement("button");
-      btnDel.className = "btn danger";
-      btnDel.textContent = "删除";
-      btnDel.addEventListener("click", () => {
-        if (!confirm(`确定删除「${d.name}」吗？`)) return;
-        // remove from list
-        dishes = dishes.filter(x => x.id !== d.id);
-        saveLS(LS_DISHES, dishes);
-        renderAll();
-        showToast("已删除", "这道菜被胖欣欣悄悄划掉了。");
-      });
-
-      const btnUpload = document.createElement("button");
-      btnUpload.className = "btn primary";
-      btnUpload.textContent = "上传/更换照片";
-      btnUpload.addEventListener("click", () => fileInput.click());
-
-      btnRow.append(btnUpload, btnEdit, btnDel);
-
+      const selectRow=document.createElement("div"); selectRow.className="selectRow";
+      const toggle=document.createElement("label"); toggle.className="toggle";
+      const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!d.selected;
+      const span=document.createElement("span"); span.textContent=d.selected?"已选中（胖欣欣准备清盘）":"加入订单";
+      toggle.append(cb,span);
+      cb.addEventListener("change",()=>{d.selected=cb.checked;span.textContent=d.selected?"已选中（胖欣欣准备清盘）":"加入订单";d.updatedAt=Date.now();saveLS(LS_DISHES,dishes);renderSummary();});
       selectRow.append(toggle);
 
-      body.append(top, note, selectRow, btnRow);
+      const btnRow=document.createElement("div"); btnRow.className="btnRow";
+      const btnUpload=document.createElement("button"); btnUpload.className="btn primary"; btnUpload.textContent="上传/更换照片";
+      const btnEdit=document.createElement("button"); btnEdit.className="btn"; btnEdit.textContent="编辑";
+      const btnDel=document.createElement("button"); btnDel.className="btn danger"; btnDel.textContent="删除";
 
-      // hidden file input
-      const fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.accept = "image/*";
-      fileInput.style.display = "none";
+      btnEdit.addEventListener("click",()=>openDishModal(d.id));
+      btnDel.addEventListener("click",()=>{if(!confirm(`确定删除「${d.name}」吗？`))return; dishes=dishes.filter(x=>x.id!==d.id); saveLS(LS_DISHES,dishes); renderAll(); showToast("已删除","这道菜被划掉了。");});
 
-      fileInput.addEventListener("change", async () => {
-        const file = fileInput.files && fileInput.files[0];
-        if (!file) return;
+      const fileInput=document.createElement("input"); fileInput.type="file"; fileInput.accept="image/*"; fileInput.style.display="none";
+      btnUpload.addEventListener("click",()=>fileInput.click());
 
-        const MAX_MB = 15;
-        if (file.size > MAX_MB * 1024 * 1024){
-          showToast("图片太大", `超过 ${MAX_MB}MB，建议压缩后再上传。`);
-          fileInput.value = "";
-          return;
-        }
-
-        const blobKey = `dish:${d.id}:full`;
-        await idbSet(blobKey, file);
-
-        const thumbUrl = await makeThumbnailDataUrl(file, 900, 0.86);
-
-        d.imageBlobKey = blobKey;
-        d.thumbDataUrl = thumbUrl;
-        d.updatedAt = Date.now();
-
-        saveLS(LS_DISHES, dishes);
-        renderDishes();
-        showToast("已保存图片", "原图已存 IndexedDB，缩略图用于快速显示。");
-
-        fileInput.value = "";
+      fileInput.addEventListener("change",async()=>{
+        const file=fileInput.files&&fileInput.files[0]; if(!file) return;
+        const MAX_MB=15;
+        if(file.size>MAX_MB*1024*1024){showToast("图片太大",`超过 ${MAX_MB}MB，建议压缩后再上传。`); fileInput.value=""; return;}
+        const blobKey=`dish:${d.id}:full`;
+        await idbSet(blobKey,file);
+        const thumbUrl=await makeThumbnailDataUrl(file,900,0.86);
+        d.imageBlobKey=blobKey; d.thumbDataUrl=thumbUrl; d.updatedAt=Date.now();
+        saveLS(LS_DISHES,dishes); renderDishes(); showToast("已保存图片","原图已存 IndexedDB。");
+        fileInput.value="";
       });
 
-      // note autosave
-      note.addEventListener("input", debounce(() => {
-        d.note = note.value;
-        d.updatedAt = Date.now();
-        saveLS(LS_DISHES, dishes);
-        renderSummary();
-      }, 220));
+      note.addEventListener("input",debounce(()=>{d.note=note.value;d.updatedAt=Date.now();saveLS(LS_DISHES,dishes);renderSummary();},220));
 
-      // click thumb to view full / upload
-      thumb.addEventListener("click", async () => {
-        if (!d.imageBlobKey){
-          fileInput.click();
-          return;
-        }
-        await showFullImage(d.imageBlobKey, `${d.cuisine} · ${d.name}`);
-      });
+      thumb.addEventListener("click",async()=>{ if(!d.imageBlobKey){fileInput.click();return;} await showFullImage(d.imageBlobKey,`${d.cuisine} · ${d.name}`); });
 
-      card.append(thumb, body, fileInput);
+      btnRow.append(btnUpload,btnEdit,btnDel);
+      body.append(top,note,selectRow,btnRow);
+      card.append(thumb,body,fileInput);
       return card;
     }
 
     function renderWishes(){
-      wishGrid.innerHTML = "";
-
-      if (!wishes.length){
-        wishGrid.innerHTML = `<div class="small">还没有心愿～ 点右上角「新增心愿」写一个吧。</div>`;
-        return;
-      }
-
-      for (const w of wishes){
-        wishGrid.appendChild(renderWishCard(w));
-      }
+      wishGrid.innerHTML="";
+      if(!wishes.length){wishGrid.innerHTML=`<div class="small">还没有心愿～ 点右上角「新增心愿」写一个吧。</div>`;return;}
+      for(const w of wishes) wishGrid.appendChild(renderWishCard(w));
     }
 
     function renderWishCard(w){
-      const card = document.createElement("div");
-      card.className = "card";
-      card.style.minHeight = "260px";
-
-      const thumb = document.createElement("div");
-      thumb.className = "thumb";
-      const img = document.createElement("img");
-      img.loading = "lazy";
-      img.decoding = "async";
-      if (w.thumbDataUrl){
-        img.src = w.thumbDataUrl;
-      }else{
-        img.style.opacity = "0";
-      }
+      const card=document.createElement("div"); card.className="card"; card.style.minHeight="260px";
+      const thumb=document.createElement("div"); thumb.className="thumb";
+      const img=document.createElement("img"); img.loading="lazy"; img.decoding="async";
+      if(w.thumbDataUrl){img.src=w.thumbDataUrl;} else {img.style.opacity="0";}
       thumb.appendChild(img);
 
-      const hint = document.createElement("div");
-      hint.className = "thumbHint";
-      const p1 = document.createElement("div");
-      p1.className = "pill";
-      p1.textContent = w.thumbDataUrl ? "点我看高清 / 换图" : "给心愿配张图（高清）";
-      const p2 = document.createElement("div");
-      p2.className = "pill";
-      p2.textContent = "Wishlist";
-      hint.append(p1, p2);
-      thumb.appendChild(hint);
+      const hint=document.createElement("div"); hint.className="thumbHint";
+      const p1=document.createElement("div"); p1.className="pill"; p1.textContent=w.thumbDataUrl?"点我看高清 / 换图":"给心愿配张图（高清）";
+      const p2=document.createElement("div"); p2.className="pill"; p2.textContent="Wishlist";
+      hint.append(p1,p2); thumb.appendChild(hint);
 
-      const body = document.createElement("div");
-      body.className = "cardBody";
+      const body=document.createElement("div"); body.className="cardBody";
+      const top=document.createElement("div"); top.className="row";
+      const name=document.createElement("p"); name.className="name"; name.textContent=w.title;
+      const meta=document.createElement("div"); meta.className="meta";
+      const b=document.createElement("span"); b.className="badge"; b.textContent="心愿"; meta.append(b);
+      top.append(name,meta);
 
-      const top = document.createElement("div");
-      top.className = "row";
+      const note=document.createElement("textarea"); note.className="note";
+      note.placeholder="写点描述：颜色/预算/想要的感觉…";
+      note.value=w.desc||"";
 
-      const name = document.createElement("p");
-      name.className = "name";
-      name.textContent = w.title;
+      const btnRow=document.createElement("div"); btnRow.className="btnRow";
+      const btnUpload=document.createElement("button"); btnUpload.className="btn primary"; btnUpload.textContent="上传/更换照片";
+      const btnEdit=document.createElement("button"); btnEdit.className="btn"; btnEdit.textContent="编辑";
+      const btnDel=document.createElement("button"); btnDel.className="btn danger"; btnDel.textContent="删除";
 
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      const b = document.createElement("span");
-      b.className = "badge";
-      b.textContent = "心愿";
-      meta.append(b);
+      btnEdit.addEventListener("click",()=>openWishModal(w.id));
+      btnDel.addEventListener("click",()=>{if(!confirm(`确定删除心愿「${w.title}」吗？`))return; wishes=wishes.filter(x=>x.id!==w.id); saveLS(LS_WISHES,wishes); renderAll(); showToast("已删除","心愿收进抽屉里。");});
 
-      top.append(name, meta);
+      const fileInput=document.createElement("input"); fileInput.type="file"; fileInput.accept="image/*"; fileInput.style.display="none";
+      btnUpload.addEventListener("click",()=>fileInput.click());
 
-      const note = document.createElement("textarea");
-      note.className = "note";
-      note.placeholder = "写点描述：颜色/预算/想要的感觉…（胖欣欣会认真看）";
-      note.value = w.desc || "";
-
-      const btnRow = document.createElement("div");
-      btnRow.className = "btnRow";
-
-      const btnUpload = document.createElement("button");
-      btnUpload.className = "btn primary";
-      btnUpload.textContent = "上传/更换照片";
-      btnUpload.addEventListener("click", () => fileInput.click());
-
-      const btnEdit = document.createElement("button");
-      btnEdit.className = "btn";
-      btnEdit.textContent = "编辑";
-      btnEdit.addEventListener("click", () => openWishModal(w.id));
-
-      const btnDel = document.createElement("button");
-      btnDel.className = "btn danger";
-      btnDel.textContent = "删除";
-      btnDel.addEventListener("click", () => {
-        if (!confirm(`确定删除心愿「${w.title}」吗？`)) return;
-        wishes = wishes.filter(x => x.id !== w.id);
-        saveLS(LS_WISHES, wishes);
-        renderAll();
-        showToast("已删除", "心愿暂时被收进抽屉里。");
+      fileInput.addEventListener("change",async()=>{
+        const file=fileInput.files&&fileInput.files[0]; if(!file) return;
+        const MAX_MB=15;
+        if(file.size>MAX_MB*1024*1024){showToast("图片太大",`超过 ${MAX_MB}MB，建议压缩后再上传。`); fileInput.value=""; return;}
+        const blobKey=`wish:${w.id}:full`;
+        await idbSet(blobKey,file);
+        const thumbUrl=await makeThumbnailDataUrl(file,900,0.86);
+        w.imageBlobKey=blobKey; w.thumbDataUrl=thumbUrl; w.updatedAt=Date.now();
+        saveLS(LS_WISHES,wishes); renderWishes(); renderSummary(); showToast("已保存图片","原图已存 IndexedDB。");
+        fileInput.value="";
       });
 
-      btnRow.append(btnUpload, btnEdit, btnDel);
+      note.addEventListener("input",debounce(()=>{w.desc=note.value;w.updatedAt=Date.now();saveLS(LS_WISHES,wishes);renderSummary();},220));
+      thumb.addEventListener("click",async()=>{ if(!w.imageBlobKey){fileInput.click();return;} await showFullImage(w.imageBlobKey,`心愿 · ${w.title}`); });
 
-      // hidden file input
-      const fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.accept = "image/*";
-      fileInput.style.display = "none";
-
-      fileInput.addEventListener("change", async () => {
-        const file = fileInput.files && fileInput.files[0];
-        if (!file) return;
-
-        const MAX_MB = 15;
-        if (file.size > MAX_MB * 1024 * 1024){
-          showToast("图片太大", `超过 ${MAX_MB}MB，建议压缩后再上传。`);
-          fileInput.value = "";
-          return;
-        }
-
-        const blobKey = `wish:${w.id}:full`;
-        await idbSet(blobKey, file);
-
-        const thumbUrl = await makeThumbnailDataUrl(file, 900, 0.86);
-
-        w.imageBlobKey = blobKey;
-        w.thumbDataUrl = thumbUrl;
-        w.updatedAt = Date.now();
-
-        saveLS(LS_WISHES, wishes);
-        renderWishes();
-        renderSummary();
-        showToast("已保存图片", "原图已存 IndexedDB，缩略图用于快速显示。");
-
-        fileInput.value = "";
-      });
-
-      note.addEventListener("input", debounce(() => {
-        w.desc = note.value;
-        w.updatedAt = Date.now();
-        saveLS(LS_WISHES, wishes);
-        renderSummary();
-      }, 220));
-
-      thumb.addEventListener("click", async () => {
-        if (!w.imageBlobKey){
-          fileInput.click();
-          return;
-        }
-        await showFullImage(w.imageBlobKey, `心愿 · ${w.title}`);
-      });
-
-      body.append(top, note, btnRow);
-      card.append(thumb, body, fileInput);
+      btnRow.append(btnUpload,btnEdit,btnDel);
+      body.append(top,note,btnRow);
+      card.append(thumb,body,fileInput);
       return card;
     }
 
     function renderSummary(){
-      // Selected dishes
-      const selected = dishes.filter(d => d.selected);
-      selectedList.innerHTML = "";
-      if (!selected.length){
-        selectedEmpty.style.display = "block";
-      }else{
-        selectedEmpty.style.display = "none";
-        selected.forEach(d => {
-          const li = document.createElement("li");
-          li.textContent = `${d.cuisine}｜${d.name}${d.price ? `（¥${d.price}）` : ""}`;
-          selectedList.appendChild(li);
-        });
-      }
+      const selected=dishes.filter(d=>d.selected);
+      selectedList.innerHTML="";
+      selectedEmpty.style.display=selected.length?"none":"block";
+      selected.forEach(d=>{
+        const li=document.createElement("li");
+        li.textContent=`${d.cuisine}｜${d.name}${d.price?`（¥${d.price}）`:""}`;
+        selectedList.appendChild(li);
+      });
 
-      // Wishes summary
-      wishSummary.innerHTML = "";
-      if (!wishes.length){
-        wishEmpty.style.display = "block";
-      }else{
-        wishEmpty.style.display = "none";
-        wishes.forEach(w => {
-          const li = document.createElement("li");
-          li.textContent = w.title;
-          wishSummary.appendChild(li);
-        });
-      }
+      wishSummary.innerHTML="";
+      wishEmpty.style.display=wishes.length?"none":"block";
+      wishes.forEach(w=>{
+        const li=document.createElement("li"); li.textContent=w.title; wishSummary.appendChild(li);
+      });
     }
 
-    // ===== Modals: Dish =====
+    // Modals: Dish
     function openDishModal(id){
-      editingDishId = id;
-      if (!id){
-        dishModalTitle.textContent = "新增菜品";
-        dishName.value = "";
-        dishCuisine.value = "中餐";
-        dishTags.value = "";
-        dishPrice.value = "";
-        dishNote.value = "";
+      editingDishId=id;
+      if(!id){
+        dishModalTitle.textContent="新增菜品";
+        dishName.value=""; dishCuisine.value="中餐"; dishTags.value=""; dishPrice.value=""; dishNote.value="";
       }else{
-        const d = dishes.find(x => x.id === id);
-        if (!d) return;
-        dishModalTitle.textContent = "编辑菜品";
-        dishName.value = d.name || "";
-        dishCuisine.value = d.cuisine || "中餐";
-        dishTags.value = d.tags || "";
-        dishPrice.value = d.price || "";
-        dishNote.value = d.note || "";
+        const d=dishes.find(x=>x.id===id); if(!d) return;
+        dishModalTitle.textContent="编辑菜品";
+        dishName.value=d.name||""; dishCuisine.value=d.cuisine||"中餐"; dishTags.value=d.tags||""; dishPrice.value=d.price||""; dishNote.value=d.note||"";
       }
-      dishModal.classList.add("show");
-      setTimeout(() => dishName.focus(), 0);
+      dishModal.classList.add("show"); setTimeout(()=>dishName.focus(),0);
     }
-    function closeDishModal(){
-      dishModal.classList.remove("show");
-      editingDishId = null;
-    }
+    function closeDishModal(){ dishModal.classList.remove("show"); editingDishId=null; }
     function saveDishFromModal(){
-      const name = (dishName.value || "").trim();
-      const cuisine = (dishCuisine.value || "").trim();
-      const tags = (dishTags.value || "").trim();
-      const price = (dishPrice.value || "").trim();
-      const note = (dishNote.value || "").trim();
-
-      if (!name){
-        showToast("缺少菜名", "请先输入菜名～");
-        dishName.focus();
-        return;
-      }
-
-      if (!editingDishId){
-        dishes.unshift({
-          id: crypto.randomUUID(),
-          cuisine: cuisine || "中餐",
-          name,
-          tags,
-          price,
-          note,
-          selected: false,
-          thumbDataUrl: null,
-          imageBlobKey: null,
-          updatedAt: Date.now()
-        });
-        saveLS(LS_DISHES, dishes);
-        renderAll();
-        closeDishModal();
-        showToast("已新增", "新菜上线，瘦媛媛请审核✅");
+      const name=(dishName.value||"").trim();
+      const cuisine=(dishCuisine.value||"").trim();
+      const tags=(dishTags.value||"").trim();
+      const price=(dishPrice.value||"").trim();
+      const note=(dishNote.value||"").trim();
+      if(!name){showToast("缺少菜名","请先输入菜名～"); dishName.focus(); return;}
+      if(!editingDishId){
+        dishes.unshift({id:crypto.randomUUID(),cuisine:cuisine||"中餐",name,tags,price,note,selected:false,thumbDataUrl:null,imageBlobKey:null,updatedAt:Date.now()});
+        saveLS(LS_DISHES,dishes); renderAll(); closeDishModal(); showToast("已新增","新菜上线✅");
       }else{
-        const d = dishes.find(x => x.id === editingDishId);
-        if (!d) return;
-        d.name = name;
-        d.cuisine = cuisine || d.cuisine;
-        d.tags = tags;
-        d.price = price;
-        d.note = note;
-        d.updatedAt = Date.now();
-        saveLS(LS_DISHES, dishes);
-        renderAll();
-        closeDishModal();
-        showToast("已保存", "编辑完成，胖欣欣说：我都可以。");
+        const d=dishes.find(x=>x.id===editingDishId); if(!d) return;
+        d.name=name; d.cuisine=cuisine||d.cuisine; d.tags=tags; d.price=price; d.note=note; d.updatedAt=Date.now();
+        saveLS(LS_DISHES,dishes); renderAll(); closeDishModal(); showToast("已保存","编辑完成。");
       }
     }
 
-    // ===== Modals: Wish =====
+    // Modals: Wish
     function openWishModal(id){
-      editingWishId = id;
-      if (!id){
-        wishModalTitle.textContent = "新增心愿";
-        wishTitleInput.value = "";
-        wishDescInput.value = "";
+      editingWishId=id;
+      if(!id){
+        wishModalTitle.textContent="新增心愿";
+        wishTitleInput.value=""; wishDescInput.value="";
       }else{
-        const w = wishes.find(x => x.id === id);
-        if (!w) return;
-        wishModalTitle.textContent = "编辑心愿";
-        wishTitleInput.value = w.title || "";
-        wishDescInput.value = w.desc || "";
+        const w=wishes.find(x=>x.id===id); if(!w) return;
+        wishModalTitle.textContent="编辑心愿";
+        wishTitleInput.value=w.title||""; wishDescInput.value=w.desc||"";
       }
-      wishModal.classList.add("show");
-      setTimeout(() => wishTitleInput.focus(), 0);
+      wishModal.classList.add("show"); setTimeout(()=>wishTitleInput.focus(),0);
     }
-    function closeWishModal(){
-      wishModal.classList.remove("show");
-      editingWishId = null;
-    }
+    function closeWishModal(){ wishModal.classList.remove("show"); editingWishId=null; }
     function saveWishFromModal(){
-      const title = (wishTitleInput.value || "").trim();
-      const desc = (wishDescInput.value || "").trim();
-      if (!title){
-        showToast("缺少心愿标题", "先写一句你想要的～");
-        wishTitleInput.focus();
-        return;
-      }
-
-      if (!editingWishId){
-        wishes.unshift({
-          id: crypto.randomUUID(),
-          title,
-          desc,
-          thumbDataUrl: null,
-          imageBlobKey: null,
-          updatedAt: Date.now()
-        });
-        saveLS(LS_WISHES, wishes);
-        renderAll();
-        closeWishModal();
-        showToast("心愿已加入", "胖欣欣：收到！已加入待办清单。");
+      const title=(wishTitleInput.value||"").trim();
+      const desc=(wishDescInput.value||"").trim();
+      if(!title){showToast("缺少心愿标题","先写一句你想要的～"); wishTitleInput.focus(); return;}
+      if(!editingWishId){
+        wishes.unshift({id:crypto.randomUUID(),title,desc,thumbDataUrl:null,imageBlobKey:null,updatedAt:Date.now()});
+        saveLS(LS_WISHES,wishes); renderAll(); closeWishModal(); showToast("心愿已加入","胖欣欣：收到！");
       }else{
-        const w = wishes.find(x => x.id === editingWishId);
-        if (!w) return;
-        w.title = title;
-        w.desc = desc;
-        w.updatedAt = Date.now();
-        saveLS(LS_WISHES, wishes);
-        renderAll();
-        closeWishModal();
-        showToast("已保存", "心愿更新完成。");
+        const w=wishes.find(x=>x.id===editingWishId); if(!w) return;
+        w.title=title; w.desc=desc; w.updatedAt=Date.now();
+        saveLS(LS_WISHES,wishes); renderAll(); closeWishModal(); showToast("已保存","心愿更新完成。");
       }
     }
 
-    // ===== Confirm Order (Local + Formspree) =====
+    // Confirm order
     async function confirmOrder(){
-      const selected = dishes.filter(d => d.selected);
-      if (!selected.length && !wishes.length){
-        showToast("还不能下单", "至少选一道菜或写一个心愿～");
-        return;
-      }
+      const selected=dishes.filter(d=>d.selected);
+      if(!selected.length && !wishes.length){showToast("还不能下单","至少选一道菜或写一个心愿～"); return;}
 
-      // Save order locally
-      const now = new Date();
-      const order = {
-        id: crypto.randomUUID(),
-        createdAt: now.toISOString(),
-        createdAtLocal: now.toLocaleString(),
-        title: "胖欣欣 & 瘦媛媛的专属情人节",
-        selectedDishes: selected.map(d => ({
-          cuisine: d.cuisine, name: d.name, price: d.price || "", tags: d.tags || "", note: d.note || ""
-        })),
-        wishes: wishes.map(w => ({ title: w.title, desc: w.desc || "" })),
-        yourEmailHint: (emailHintEl.value || "").trim()
+      const now=new Date();
+      const order={
+        id:crypto.randomUUID(),
+        createdAt:now.toISOString(),
+        createdAtLocal:now.toLocaleString(),
+        title:"胖欣欣 & 瘦媛媛的专属情人节",
+        selectedDishes:selected.map(d=>({cuisine:d.cuisine,name:d.name,price:d.price||"",tags:d.tags||"",note:d.note||""})),
+        wishes:wishes.map(w=>({title:w.title,desc:w.desc||""})),
+        yourEmailHint:(emailHintEl.value||"").trim()
       };
 
-      const history = loadLS(LS_ORDERS) || [];
+      const history=loadLS(LS_ORDERS)||[];
       history.unshift(order);
-      saveLS(LS_ORDERS, history);
+      saveLS(LS_ORDERS,history);
 
-      // Send email via Formspree
-      const endpoint = (endpointEl.value || "").trim();
-      if (!endpoint){
-        showToast("已保存到本地 ✅", "未填写 Formspree endpoint，因此未发送邮件。");
-        return;
-      }
+      const endpoint=(endpointEl.value||"").trim() || DEFAULT_FORMSPREE_ENDPOINT;
+      if(!endpoint){showToast("已保存到本地 ✅","未填写 endpoint，因此未发送邮件。"); return;}
 
-      showToast("正在发送邮件…", "爱情正在路上（如果失败也已保存本地）。");
-
+      showToast("正在发送邮件…","如果失败也没事：订单已经本地保存。");
       try{
-        const text = buildOrderEmailText(order);
-
-        // Formspree accepts JSON (with Accept: application/json)
-        const resp = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            subject: "💌 情人节下单通知｜胖欣欣 & 瘦媛媛",
-            message: text,
-            your_email: order.yourEmailHint || "",
-            created_at: order.createdAtLocal
+        const text=buildOrderEmailText(order);
+        const resp=await fetch(endpoint,{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Accept":"application/json"},
+          body:JSON.stringify({
+            subject:"💌 情人节下单通知｜胖欣欣 & 瘦媛媛",
+            message:text,
+            your_email:order.yourEmailHint||"",
+            created_at:order.createdAtLocal
           })
         });
-
-        if (!resp.ok){
-          const t = await safeReadText(resp);
-          throw new Error(`发送失败：HTTP ${resp.status} ${resp.statusText}${t ? " / " + t : ""}`);
+        if(!resp.ok){
+          const t=await safeReadText(resp);
+          throw new Error(`发送失败：HTTP ${resp.status} ${resp.statusText}${t?(" / "+t):""}`);
         }
-
-        showToast("发送成功 ✅", "邮件已发出：胖欣欣收到订单，准备上菜（和买单）。");
+        showToast("发送成功 ✅","邮件已发出：胖欣欣收到订单，准备上菜（和买单）。");
       }catch(e){
-        showToast("邮件发送失败", (e?.message || String(e)) + "（但订单已保存到本地）");
+        showToast("邮件发送失败",(e?.message||String(e))+"（但订单已保存到本地）");
       }
     }
 
     function buildOrderEmailText(order){
-      const lines = [];
+      const lines=[];
       lines.push("胖欣欣 & 瘦媛媛的专属情人节｜下单通知");
       lines.push("—");
       lines.push(`下单时间：${order.createdAtLocal}`);
-      if (order.yourEmailHint) lines.push(`下单人邮箱(备注)：${order.yourEmailHint}`);
+      if(order.yourEmailHint) lines.push(`下单人邮箱(备注)：${order.yourEmailHint}`);
       lines.push("");
 
       lines.push("已选菜单：");
-      if (order.selectedDishes.length){
-        order.selectedDishes.forEach((d, i) => {
-          lines.push(`${i+1}. ${d.cuisine}｜${d.name}${d.price ? `（¥${d.price}）` : ""}${d.tags ? `｜${d.tags}` : ""}`);
-          if (d.note) lines.push(`   备注：${d.note}`);
+      if(order.selectedDishes.length){
+        order.selectedDishes.forEach((d,i)=>{
+          lines.push(`${i+1}. ${d.cuisine}｜${d.name}${d.price?`（¥${d.price}）`:""}${d.tags?`｜${d.tags}`:""}`);
+          if(d.note) lines.push(`   备注：${d.note}`);
         });
-      }else{
-        lines.push("（未选择菜品）");
-      }
+      }else lines.push("（未选择菜品）");
 
       lines.push("");
       lines.push("心愿清单：");
-      if (order.wishes.length){
-        order.wishes.forEach((w, i) => {
+      if(order.wishes.length){
+        order.wishes.forEach((w,i)=>{
           lines.push(`${i+1}. ${w.title}`);
-          if (w.desc) lines.push(`   描述：${w.desc}`);
+          if(w.desc) lines.push(`   描述：${w.desc}`);
         });
-      }else{
-        lines.push("（无心愿）");
-      }
+      }else lines.push("（无心愿）");
 
       lines.push("");
       lines.push("俏皮备注：");
       lines.push("“瘦媛媛负责点餐，胖欣欣负责清盘（和买单）。”");
       lines.push("“点击确认下单，爱情即刻送达。”");
-
       return lines.join("\n");
     }
 
-    async function safeReadText(resp){
-      try{ return (await resp.text()).slice(0, 200); }catch{ return ""; }
-    }
+    async function safeReadText(resp){ try{ return (await resp.text()).slice(0,200);}catch{return"";} }
 
-    // ===== Toast =====
-    function showToast(title, msg){
-      toastTitle.textContent = title;
-      toastMsg.textContent = msg;
+    function showToast(title,msg){
+      toastTitle.textContent=title; toastMsg.textContent=msg;
       toast.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 4200);
+      toastTimer=setTimeout(()=>toast.classList.remove("show"),4200);
     }
 
-    // ===== LocalStorage helpers =====
-    function loadLS(key){
-      try{
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : null;
-      }catch{
-        return null;
-      }
-    }
-    function saveLS(key, val){
-      localStorage.setItem(key, JSON.stringify(val));
-    }
+    function loadLS(key){ try{const raw=localStorage.getItem(key); return raw?JSON.parse(raw):null;}catch{return null;} }
+    function saveLS(key,val){ localStorage.setItem(key,JSON.stringify(val)); }
 
-    // ===== Debounce =====
-    function debounce(fn, waitMs){
-      let t = null;
-      return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn(...args), waitMs);
-      };
-    }
+    function debounce(fn,waitMs){ let t=null; return (...args)=>{clearTimeout(t); t=setTimeout(()=>fn(...args),waitMs);} }
 
-    // ===== IndexedDB (HD image blobs) =====
+    // IndexedDB
     function openDB(){
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB_NAME, 1);
-        req.onupgradeneeded = () => {
-          const db = req.result;
-          if (!db.objectStoreNames.contains(STORE)){
-            db.createObjectStore(STORE);
-          }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+      return new Promise((resolve,reject)=>{
+        const req=indexedDB.open(DB_NAME,1);
+        req.onupgradeneeded=()=>{const db=req.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);};
+        req.onsuccess=()=>resolve(req.result);
+        req.onerror=()=>reject(req.error);
       });
     }
-
-    async function idbSet(key, blob){
-      const db = await openDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE, "readwrite");
-        tx.objectStore(STORE).put(blob, key);
-        tx.oncomplete = () => resolve(true);
-        tx.onerror = () => reject(tx.error);
+    async function idbSet(key,blob){
+      const db=await openDB();
+      return new Promise((resolve,reject)=>{
+        const tx=db.transaction(STORE,"readwrite");
+        tx.objectStore(STORE).put(blob,key);
+        tx.oncomplete=()=>resolve(true);
+        tx.onerror=()=>reject(tx.error);
       });
     }
-
     async function idbGet(key){
-      const db = await openDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE, "readonly");
-        const req = tx.objectStore(STORE).get(key);
-        req.onsuccess = () => resolve(req.result || null);
-        req.onerror = () => reject(req.error);
+      const db=await openDB();
+      return new Promise((resolve,reject)=>{
+        const tx=db.transaction(STORE,"readonly");
+        const req=tx.objectStore(STORE).get(key);
+        req.onsuccess=()=>resolve(req.result||null);
+        req.onerror=()=>reject(req.error);
       });
     }
-
     async function idbClearAll(){
-      const db = await openDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE, "readwrite");
+      const db=await openDB();
+      return new Promise((resolve,reject)=>{
+        const tx=db.transaction(STORE,"readwrite");
         tx.objectStore(STORE).clear();
-        tx.oncomplete = () => resolve(true);
-        tx.onerror = () => reject(tx.error);
+        tx.oncomplete=()=>resolve(true);
+        tx.onerror=()=>reject(tx.error);
       });
     }
 
-    // Thumbnail generator: small, stored in LocalStorage for fast render
-    async function makeThumbnailDataUrl(file, maxW=900, quality=0.86){
-      const bmp = await createImageBitmap(file);
-      const scale = Math.min(1, maxW / bmp.width);
-      const w = Math.max(1, Math.round(bmp.width * scale));
-      const h = Math.max(1, Math.round(bmp.height * scale));
-
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d", {alpha:false});
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(bmp, 0, 0, w, h);
-
-      // Prefer WebP; fallback JPEG
-      let type = "image/webp";
-      let url = canvas.toDataURL(type, quality);
-      if (!url.startsWith("data:image/webp")){
-        type = "image/jpeg";
-        url = canvas.toDataURL(type, quality);
+    async function makeThumbnailDataUrl(file,maxW=900,quality=0.86){
+      const bmp=await createImageBitmap(file);
+      const scale=Math.min(1,maxW/bmp.width);
+      const w=Math.max(1,Math.round(bmp.width*scale));
+      const h=Math.max(1,Math.round(bmp.height*scale));
+      const canvas=document.createElement("canvas"); canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext("2d",{alpha:false});
+      ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+      ctx.drawImage(bmp,0,0,w,h);
+      let type="image/webp";
+      let url=canvas.toDataURL(type,quality);
+      if(!url.startsWith("data:image/webp")){
+        type="image/jpeg";
+        url=canvas.toDataURL(type,quality);
       }
       return url;
     }
 
-    // Full image preview
-    async function showFullImage(blobKey, title){
-      const blob = await idbGet(blobKey);
-      if (!blob){
-        showToast("找不到原图", "可能被浏览器清理过，请重新上传。");
-        return;
-      }
-      const url = URL.createObjectURL(blob);
-      imgModalTitle.textContent = title || "高清预览";
-      imgModalImg.src = url;
-      imgModal.dataset.url = url;
+    async function showFullImage(blobKey,title){
+      const blob=await idbGet(blobKey);
+      if(!blob){showToast("找不到原图","可能被浏览器清理过，请重新上传。");return;}
+      const url=URL.createObjectURL(blob);
+      imgModalTitle.textContent=title||"高清预览";
+      imgModalImg.src=url;
+      imgModal.dataset.url=url;
       imgModal.classList.add("show");
     }
-
     function closeImgModal(){
       imgModal.classList.remove("show");
-      const url = imgModal.dataset.url;
-      if (url) URL.revokeObjectURL(url);
-      imgModal.dataset.url = "";
-      imgModalImg.src = "";
+      const url=imgModal.dataset.url;
+      if(url) URL.revokeObjectURL(url);
+      imgModal.dataset.url="";
+      imgModalImg.src="";
     }
   </script>
 </body>
 </html>
-
-                        <!DOCTYPE html>
-                        <html lang="en">
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<style>
-								body {
-									background-color: white; /* Ensure the iframe has a white background */
-								}
-
-								/* 通用样式 */
-body {
-    /* 引入 Google Fonts: Noto Sans SC 用于正文，Dancing Script 用于标题 */
-    font-family: 'Noto Sans SC', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #FDF8F5; /* 柔和的暖米色背景 */
-    color: #333333; /* 深灰色文字 */
-    line-height: 1.6;
-    scroll-behavior: smooth; /* 平滑滚动效果 */
-}
-
-.container {
-    max-width: 1200px; /* 页面最大宽度 */
-    margin: 30px auto; /* 居中显示，上下更多外边距 */
-    padding: 0 25px; /* 左右内边距 */
-}
-
-/* 头部样式 */
-.site-header {
-    background-color: #FF6B8B; /* 柔和的玫瑰粉 */
-    color: white;
-    text-align: center;
-    padding: 50px 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 底部柔和阴影 */
-}
-
-.site-header h1 {
-    font-family: 'Dancing Script', cursive; /* 个性化手写字体 */
-    margin: 0 0 10px;
-    font-size: 3.5em; /* 标题更大 */
-    letter-spacing: 2px; /* 增加字间距 */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* 轻微文字阴影 */
-}
-
-.site-header p {
-    font-size: 1.2em;
-    opacity: 0.9;
-    font-weight: 300; /* 字体更细 */
-}
-
-/* 全新 Banner 样式 - 带动画 */
-.banner-section {
-    background-color: #FF6B8B; /* 默认背景色 */
-    color: white;
-    text-align: center;
-    padding: 100px 20px; /* 更多内边距 */
-    margin-bottom: 40px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* 更明显的阴影 */
-}
-
-.banner-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* 流动的渐变背景 */
-    background: linear-gradient(135deg,
-        #FFD1AA 0%,   /* 暖桃色 */
-        #FFADCB 25%,  /* 淡粉色 */
-        #FFD1AA 50%,
-        #FFADCB 75%,
-        #FFD1AA 100%
-    );
-    background-size: 400% 400%; /* 使渐变足够大以便移动 */
-    animation: gradientAnimation 18s ease infinite alternate; /* 18s 动画，缓动，无限重复，来回播放 */
-    z-index: 1; /* 在内容下方 */
-    opacity: 0.8; /* 稍透明 */
-}
-
-@keyframes gradientAnimation {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 100% 100%; }
-}
-
-.banner-content {
-    position: relative;
-    z-index: 2;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-/* Banner 文字动画 */
-.banner-content h2,
-.banner-content p,
-.banner-btn {
-    opacity: 0; /* 初始状态为透明 */
-    transform: translateY(20px); /* 初始状态稍微向下偏移 */
-    animation-fill-mode: forwards; /* 动画结束后保持最终状态 */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); /* 文字阴影，突出显示 */
-}
-
-.banner-content h2 {
-    font-size: 3.2em;
-    margin-bottom: 20px;
-    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s forwards; /* 曲线缓动 */
-}
-
-.banner-content p {
-    font-size: 1.5em;
-    margin-bottom: 40px;
-    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards;
-}
-
-.banner-btn {
-    animation: fadeInSlideUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.5s forwards;
-}
-
-@keyframes fadeInSlideUp {
-    0% {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.banner-btn {
-    background-color: #FF6B8B; /* 与头部颜色一致 */
-    color: white;
-    padding: 14px 30px;
-    border-radius: 30px; /* 更圆润的按钮 */
-    font-size: 1.1em;
-    font-weight: bold;
-    text-decoration: none;
-    margin: 0 15px;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.banner-btn:hover {
-    background-color: #E65A7A; /* 鼠标悬停时颜色变深 */
-    transform: translateY(-5px); /* 向上浮动更多 */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-
-/* 章节通用样式 */
-section {
-    background-color: #fff; /* 白色背景 */
-    border-radius: 15px; /* 更大的圆角 */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* 柔和阴影 */
-    margin-bottom: 40px;
-    padding: 35px;
-}
-
-section h2 {
-    font-family: 'Noto Sans SC', sans-serif;
-    color: #333333;
-    text-align: center;
-    margin-bottom: 35px;
-    font-size: 2.5em;
-    position: relative;
-    padding-bottom: 15px;
-    letter-spacing: 1px;
-    font-weight: 700;
-}
-
-section h2::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 0;
-    width: 80px;
-    height: 5px;
-    background-color: #FFD1AA; /* 柔和的桃色下划线 */
-    border-radius: 3px;
-}
-
-/* 菜单和心愿清单网格布局 */
-.menu-grid, .wishlist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 响应式网格，适应更小的卡片 */
-    gap: 30px; /* 网格间距 */
-}
-
-/* 菜单项和心愿项通用样式 */
-.menu-item, .wishlist-item {
-    border: none; /* 移除默认边框 */
-    border-radius: 15px; /* 更大的圆角 */
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* 初始柔和阴影 */
-}
-
-.menu-item:hover, .wishlist-item:hover {
-    transform: translateY(-10px); /* 向上浮动更多 */
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* 更明显的阴影 */
-}
-
-.menu-item img, .wishlist-item img {
-    width: 100%;
-    height: 220px; /* 图片高度增加 */
-    object-fit: cover;
-    display: block;
-    border-bottom: 1px solid #f0f0f0; /* 浅色分隔线 */
-}
-
-.menu-item h3, .wishlist-item h3 {
-    margin: 18px 20px 8px;
-    font-size: 1.6em;
-    color: #333333;
-    font-weight: 700;
-}
-
-.menu-item p, .wishlist-item p {
-    margin: 0 20px 18px;
-    font-size: 1em;
-    color: #666666;
-    flex-grow: 1;
-    line-height: 1.5;
-}
-
-.menu-item .price {
-    display: block;
-    text-align: right;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #FF6B8B; /* 醒目玫瑰粉价格 */
-    padding: 12px 20px 18px;
-    border-top: 1px solid #f0f0f0;
-}
-
-/* 菜单点菜按钮 */
-.select-menu-btn {
-    background-color: #66BB6A; /* 柔和绿色 */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px; /* 稍圆润的按钮 */
-    cursor: pointer;
-    font-size: 1.05em;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    margin: 0 20px 20px auto;
-    display: block;
-    width: fit-content;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.select-menu-btn:hover {
-    background-color: #4CAF50; /* 悬停时更深的绿色 */
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* 菜单介绍和添加按钮容器 */
-.menu-intro, .wishlist-intro {
-    text-align: center;
-    font-size: 1.15em;
-    color: #555;
-    margin-bottom: 30px;
-    line-height: 1.5;
-}
-.add-menu-item-container, .add-wish-container {
-    text-align: center;
-    margin-bottom: 30px;
-}
-.add-menu-item-btn {
-    background-color: #FFD1AA; /* 桃色添加按钮 */
-    color: #333333;
-    padding: 14px 30px;
-    font-size: 1.1em;
-    font-weight: bold;
-    border-radius: 30px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-.add-menu-item-btn:hover {
-    background-color: #FFC099; /* 悬停时颜色变深 */
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-/* 我的订单区样式 */
-.order-section {
-    background-color: #FFF7EC; /* 浅米色背景，与主色调协调 */
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    margin-bottom: 40px;
-    padding: 35px;
-}
-
-.order-section h2 {
-    color: #FF8A65; /* 柔和的橙色标题 */
-    position: relative;
-}
-.order-section h2::after {
-    background-color: #FF8A65;
-}
-
-#order-summary-list {
-    margin-top: 25px;
-    margin-bottom: 25px;
-    border-top: 1px dashed #e0e0e0;
-    padding-top: 20px;
-}
-
-.order-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px dotted #eeeeee;
-    font-size: 1.1em;
-    color: #555;
-    flex-wrap: wrap;
-}
-
-.order-list-item:last-child {
-    border-bottom: none;
-}
-
-.order-item-details {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-grow: 1;
-    flex-wrap: wrap;
-}
-
-.order-item-price-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
-    flex-shrink: 0;
-    font-weight: bold;
-    color: #FF6B8B;
-}
-
-/* 数量控制按钮和输入框 */
-.qty-controls {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: 10px;
-}
-
-.btn-qty {
-    background-color: #B0BEC5; /* 柔和的蓝灰色 */
-    color: white;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.3s ease;
-}
-
-.btn-qty:hover {
-    background-color: #90A4AE;
-}
-
-/* 数量输入框样式 */
-.item-qty-input {
-    width: 45px; /* 宽度增加 */
-    text-align: center;
-    border: 1px solid #E0E0E0; /* 柔和边框 */
-    border-radius: 5px;
-    padding: 6px 0; /* 填充增加 */
-    font-weight: bold;
-    color: #333333;
-    font-size: 1em;
-    -moz-appearance: textfield; /* 隐藏 Firefox 的默认上下箭头 */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-/* 隐藏 Chrome, Safari, Edge 的默认上下箭头 */
-.item-qty-input::-webkit-outer-spin-button,
-.item-qty-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-.item-qty-input:focus {
-    border-color: #64B5F6; /* 聚焦时蓝色边框 */
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2); /* 聚焦时蓝色阴影 */
-    background-color: #F8FCFF; /* 聚焦时浅色背景 */
-}
-
-
-.btn-small {
-    padding: 6px 12px;
-    font-size: 0.9em;
-    border-radius: 5px;
-    background-color: #B0BEC5; /* 小按钮颜色 */
-}
-
-.btn-small:hover {
-    background-color: #90A4AE;
-}
-
-.order-total-area {
-    text-align: right;
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #FF6B8B; /* 总计颜色 */
-    margin-top: 30px;
-    padding-top: 15px;
-    border-top: 2px solid #FFD1AA; /* 柔和的桃色边框 */
-}
-
-.order-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 35px;
-    flex-wrap: wrap;
-}
-
-.confirm-order-btn {
-    background-color: #66BB6A; /* 柔和绿色确认按钮 */
-}
-.confirm-order-btn:hover {
-    background-color: #4CAF50;
-}
-
-.clear-order-btn {
-    background-color: #EF5350; /* 柔和红色清空按钮 */
-}
-.clear-order-btn:hover {
-    background-color: #D32F2F;
-}
-
-/* 心愿清单区样式 */
-.wishlist-intro {
-    text-align: center;
-    font-size: 1.15em;
-    color: #555;
-    margin-bottom: 30px;
-}
-
-/* 新增心愿按钮样式 */
-.add-wish-btn {
-    background-color: #FFD1AA; /* 桃色，与菜单添加按钮协调 */
-    color: #333333;
-    padding: 14px 30px;
-    font-size: 1.1em;
-    font-weight: bold;
-    border-radius: 30px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.add-wish-btn:hover {
-    background-color: #FFC099;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-.wishlist-item .status {
-    text-align: right;
-    font-size: 1.05em;
-    font-weight: bold;
-    padding: 12px 20px 18px;
-    border-top: 1px solid #f0f0f0;
-    margin-top: auto;
-}
-
-.wishlist-item .status.fulfilled {
-    color: #4CAF50; /* 达成心愿为绿色 */
-}
-
-.wishlist-item .status.pending {
-    color: #FFCC80; /* 未达成心愿为柔和橙色 */
-}
-
-/* 编辑模式下的样式 */
-.wishlist-item.editing, .menu-item.editing {
-    border: 2px solid #64B5F6; /* 编辑时柔和蓝色边框 */
-    box-shadow: 0 8px 20px rgba(100, 181, 246, 0.3); /* 更明显的蓝色阴影 */
-}
-
-/* 可编辑区域的视觉提示 */
-.wishlist-item h3[contenteditable="true"],
-.wishlist-item p[contenteditable="true"],
-.menu-item h3[contenteditable="true"],
-.menu-item p[contenteditable="true"],
-.menu-item .price[contenteditable="true"] {
-    border: 1px dotted #ccc;
-    padding: 3px 5px;
-    border-radius: 5px;
-    outline: none;
-    background-color: #fcfcfc;
-}
-
-/* 状态选择下拉菜单 */
-.status-select {
-    width: auto;
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 0.95em;
-    margin-left: 10px;
-    vertical-align: middle;
-}
-
-/* 动作按钮容器 */
-.item-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 12px 20px 18px;
-    border-top: 1px solid #f0f0f0;
-    gap: 12px; /* 按钮之间间隔 */
-    flex-wrap: wrap;
-}
-
-/* 菜单项的 actions 按钮，点菜按钮会和它们在同一行 */
-.menu-actions {
-    justify-content: flex-start;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-/* 通用按钮样式 (基础样式) */
-.btn {
-    background-color: #90A4AE; /* 柔和的蓝灰色 */
-    color: white;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    font-weight: 500;
-}
-
-.btn:hover {
-    opacity: 0.95;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-/* 编辑按钮特定样式 */
-.edit-btn, .edit-menu-btn {
-    background-color: #64B5F6; /* 柔和蓝色编辑按钮 */
-}
-.edit-btn:hover, .edit-menu-btn:hover {
-    background-color: #42A5F5;
-}
-
-/* 保存按钮特定样式 */
-.save-btn, .save-menu-btn {
-    background-color: #66BB6A; /* 柔和绿色保存按钮 */
-}
-.save-btn:hover, .save-menu-btn:hover {
-    background-color: #4CAF50;
-}
-
-/* 删除按钮特定样式 */
-.delete-btn, .delete-menu-btn {
-    background-color: #EF5350; /* 柔和红色删除按钮 */
-}
-.delete-btn:hover, .delete-menu-btn:hover {
-    background-color: #D32F2F;
-}
-
-/* 更换图片按钮样式 (与上传标签相同, 但此处用于编辑模式) */
-.upload-label {
-    display: inline-block;
-    background-color: #FFCC80; /* 柔和橙色 */
-    color: #333333;
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    font-weight: 500;
-}
-
-.upload-label:hover {
-    background-color: #FFB74D; /* 悬停深橙色 */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-/* 数据管理按钮容器 */
-.data-management {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 40px;
-    padding-top: 25px;
-    border-top: 1px dashed #e0e0e0;
-    flex-wrap: wrap;
-}
-
-.export-btn {
-    background-color: #90A4AE; /* 导出按钮 - 柔和蓝灰色 */
-}
-.export-btn:hover {
-    background-color: #78909C;
-}
-
-.import-label {
-    background-color: #81D4FA; /* 导入按钮 - 柔和天蓝色 */
-    color: #333333;
-}
-.import-label:hover {
-    background-color: #4FC3F7;
-}
-
-
-/* 初始加载占位符 */
-.initial-placeholder {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 0;
-    color: #999;
-    font-style: italic;
-    font-size: 1.1em;
-}
-
-
-/* 注意事项 */
-.note {
-    text-align: center;
-    font-size: 0.9em;
-    color: #777;
-    margin-top: 50px;
-    padding: 25px;
-    background-color: #FFF7EC; /* 浅米色背景 */
-    border-radius: 12px;
-    border-left: 6px solid #FFD1AA; /* 柔和桃色左侧边框 */
-    line-height: 1.7;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-}
-.note strong {
-    color: #FF8A65; /* 强调文字颜色 */
-}
-
-/* 底部样式 */
-.site-footer {
-    text-align: center;
-    padding: 30px 20px;
-    background-color: #333333;
-    color: #cccccc;
-    font-size: 0.95em;
-    margin-top: 50px;
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .site-header h1 {
-        font-size: 2.5em;
-    }
-    section h2 {
-        font-size: 2em;
-        padding-bottom: 10px;
-        margin-bottom: 25px;
-    }
-    section h2::after {
-        width: 60px;
-        height: 4px;
-    }
-    .menu-grid, .wishlist-grid {
-        grid-template-columns: 1fr;
-    }
-    .container {
-        margin: 20px auto;
-        padding: 0 15px;
-    }
-    section {
-        padding: 25px;
-        margin-bottom: 30px;
-    }
-    .banner-section {
-        padding: 70px 15px;
-    }
-    .banner-content h2 {
-        font-size: 2.5em;
-    }
-    .banner-content p {
-        font-size: 1.2em;
-    }
-    .banner-btn {
-        display: block;
-        width: 90%;
-        margin: 15px auto;
-        font-size: 1em;
-        padding: 12px 25px;
-    }
-    .item-actions {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 15px 20px 20px;
-    }
-    .item-actions .btn, .item-actions .upload-label {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    .order-actions, .data-management {
-        flex-direction: column;
-    }
-    .order-actions .btn, .data-management .btn, .data-management .import-label {
-        width: 100%;
-        margin-bottom: 12px;
-    }
-    .order-list-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .order-item-details, .order-item-price-actions {
-        width: 100%;
-        margin-left: 0;
-        justify-content: space-between;
-        margin-bottom: 8px;
-    }
-    .order-item-price-actions > span {
-        margin-right: auto;
-    }
-    .menu-item img, .wishlist-item img {
-        height: 180px; /* 减小图片高度 */
-    }
-    .item-qty-input {
-        width: 40px; /* 小屏幕下输入框宽度 */
-        padding: 5px 0;
-    }
-    .btn-qty {
-        width: 28px;
-        height: 28px;
-        padding: 4px 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .site-header {
-        padding: 35px 15px;
-    }
-    .site-header h1 {
-        font-size: 2em;
-    }
-    .site-header p {
-        font-size: 1em;
-    }
-    section h2 {
-        font-size: 1.8em;
-    }
-    .add-wish-btn, .select-menu-btn, .add-menu-item-btn {
-        font-size: 0.95em;
-        padding: 10px 20px;
-    }
-    .menu-item h3, .wishlist-item h3 {
-        font-size: 1.4em;
-    }
-    .menu-item p, .wishlist-item p {
-        font-size: 0.9em;
-    }
-    .menu-item .price {
-        font-size: 1.3em;
-    }
-    .order-total-area {
-        font-size: 1.5em;
-    }
-}
-							</style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>胖欣欣瘦媛媛家庭呵护网</title>
-    <!-- 引入 Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
-    <!-- 引入外部CSS文件 -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header class="site-header">
-        <h1>胖欣欣瘦媛媛家庭呵护网</h1>
-        <p>专属你和她的菜单与心愿清单</p>
-    </header>
-
-    <!-- 全新 Banner 部分 -->
-    <section class="banner-section">
-        <div class="banner-content">
-            <h2>我们的小确幸，从这里开始</h2>
-            <p>精心为您准备的美味，和我们共同期待的未来</p>
-            <a href="#menu-grid-section" class="btn banner-btn">查看菜单</a>
-            <a href="#wishlist-grid-section" class="btn banner-btn">查看心愿</a>
-        </div>
-    </section>
-
-    <main class="container">
-        <!-- 菜单部分 -->
-        <section class="menu-section" id="menu-grid-section">
-            <h2>美味菜单</h2>
-            <p class="menu-intro">在这里，您可以为她准备和调整菜单。</p>
-            <div class="add-menu-item-container">
-                <button class="btn add-menu-item-btn">添加新菜品</button>
-            </div>
-            <div class="menu-grid" id="menu-grid">
-                <!-- 菜单项将由JavaScript动态加载和渲染 -->
-                <div class="initial-placeholder">
-                    <p>正在加载菜单...</p>
-                </div>
-            </div>
-            <!-- 菜单导入/导出按钮 -->
-            <div class="data-management">
-                <button class="btn export-btn" id="export-menu-btn">导出菜单</button>
-                <label for="import-menu-file" class="btn import-label">导入菜单</label>
-                <input type="file" id="import-menu-file" accept=".json" style="display: none;">
-            </div>
-        </section>
-
-        <!-- 我的订单部分 -->
-        <section class="order-section">
-            <h2>我的订单</h2>
-            <div id="order-summary-list">
-                <!-- 订单列表将由JavaScript动态加载和渲染 -->
-                <p>暂无已点菜品。</p>
-            </div>
-            <div class="order-total-area">
-                <span>总计：</span><span id="order-total">¥ 0.00</span>
-            </div>
-            <div class="order-actions">
-                <button class="btn confirm-order-btn">确认订单</button>
-                <button class="btn clear-order-btn">清空订单</button>
-            </div>
-            <!-- 订单导入/导出按钮 -->
-            <div class="data-management">
-                <button class="btn export-btn" id="export-order-btn">导出订单</button>
-                <label for="import-order-file" class="btn import-label">导入订单</label>
-                <input type="file" id="import-order-file" accept=".json" style="display: none;">
-            </div>
-        </section>
-
-        <!-- 心愿清单部分 -->
-        <section class="wishlist-section" id="wishlist-grid-section">
-            <h2>心愿清单</h2>
-            <p class="wishlist-intro">这些是我们共同期待的心愿，努力让它们一一实现！</p>
-            <!-- 新增心愿按钮 -->
-            <div class="add-wish-container">
-                <button class="btn add-wish-btn">添加新心愿</button>
-            </div>
-            <div class="wishlist-grid" id="wishlist-grid">
-                <!-- 心愿项将由JavaScript动态加载和渲染 -->
-                <div class="initial-placeholder">
-                    <p>正在加载心愿清单...</p>
-                </div>
-            </div>
-            <!-- 心愿清单导入/导出按钮 -->
-            <div class="data-management">
-                <button class="btn export-btn" id="export-wishlist-btn">导出心愿清单</button>
-                <label for="import-wishlist-file" class="btn import-label">导入心愿清单</label>
-                <input type="file" id="import-wishlist-file" accept=".json" style="display: none;">
-            </div>
-            <p class="note">
-                <strong>重要提示：</strong>此页面所有数据（菜单、订单、心愿清单）均已保存到您**当前浏览器**的本地存储中。<br>
-                关闭浏览器或刷新页面后数据将保留。但若您清除浏览器数据、更换浏览器或设备，这些数据将丢失。<br>
-                **多设备同步：** 您可以通过**导出**功能保存当前数据，然后将导出的JSON文件传输到另一台设备，再通过**导入**功能载入数据，以实现**手动同步**。<br>
-                **订单通知：** 本页面为纯前端实现，当您确认订单时，订单数据会在浏览器控制台 (F12 打开开发者工具查看) 中打印，同时会尝试通过 `mailto:` 协议打开邮件客户端发送通知。请注意 `mailto:` 需要用户手动确认发送，且可能受浏览器和客户端限制。若需自动通知，需要后端服务器和数据库支持。
-            </p>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <p>&copy; 2023 胖欣欣瘦媛媛家庭呵护网. All rights reserved.</p>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuGrid = document.getElementById('menu-grid');
-            const addMenuItemBtn = document.querySelector('.add-menu-item-btn');
-            const orderSummaryList = document.getElementById('order-summary-list');
-            const orderTotalSpan = document.getElementById('order-total');
-            const confirmOrderBtn = document.querySelector('.confirm-order-btn');
-            const clearOrderBtn = document.querySelector('.clear-order-btn');
-
-            const wishlistGrid = document.getElementById('wishlist-grid');
-            const addWishBtn = document.querySelector('.add-wish-btn');
-
-            // 导入导出按钮
-            const exportMenuBtn = document.getElementById('export-menu-btn');
-            const importMenuFile = document.getElementById('import-menu-file');
-            const exportOrderBtn = document.getElementById('export-order-btn');
-            const importOrderFile = document.getElementById('import-order-file');
-            const exportWishlistBtn = document.getElementById('export-wishlist-btn');
-            const importWishlistFile = document.getElementById('import-wishlist-file');
-
-            let menuItems = []; // 存储所有菜单项的数组
-            let wishlistItems = []; // 存储所有心愿清单项的数组
-            let selectedOrder = []; // 存储已点菜单项的数组
-
-            // ========================= 通用数据操作函数 =========================
-            function saveToLocalStorage(key, data) {
-                localStorage.setItem(key, JSON.stringify(data));
-            }
-
-            function loadFromLocalStorage(key, defaultData) {
-                const storedData = localStorage.getItem(key);
-                return storedData ? JSON.parse(storedData) : defaultData;
-            }
-
-            // ========================= 菜单管理相关函数 =========================
-            function loadMenu() {
-                // 如果 localStorage 为空，使用预设的初始数据
-                const defaultMenuItems = [
-                    // 中餐
-                    {
-                        id: 'menu-cn-1',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=宫保鸡丁',
-                        title: '宫保鸡丁',
-                        description: '经典川菜，香辣可口，鸡肉丁与花生、辣椒的完美结合。',
-                        price: 78.00
-                    },
-                    {
-                        id: 'menu-cn-2',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=麻婆豆腐',
-                        title: '麻婆豆腐',
-                        description: '家常川菜，麻辣鲜香，豆腐细嫩，开胃下饭。',
-                        price: 58.00
-                    },
-                    {
-                        id: 'menu-cn-3',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=扬州炒饭',
-                        title: '扬州炒饭',
-                        description: '粒粒分明，配料丰富，蛋香米香交织，老少皆宜。',
-                        price: 45.00
-                    },
-                    {
-                        id: 'menu-cn-4',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=小笼包',
-                        title: '上海小笼包',
-                        description: '皮薄馅大，汤汁鲜美，一口咬下，唇齿留香。',
-                        price: 35.00
-                    },
-                    // 日餐
-                    {
-                        id: 'menu-jp-1',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=寿司拼盘',
-                        title: '寿司拼盘',
-                        description: '新鲜鱼生搭配精致米饭，口味丰富，是日本料理的代表。',
-                        price: 138.00
-                    },
-                    {
-                        id: 'menu-jp-2',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=豚骨拉面',
-                        title: '豚骨拉面',
-                        description: '浓郁豚骨汤底，搭配劲道拉面、叉烧和溏心蛋，满足味蕾。',
-                        price: 75.00
-                    },
-                    {
-                        id: 'menu-jp-3',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=日式天妇罗',
-                        title: '日式天妇罗',
-                        description: '新鲜虾仁与蔬菜裹上薄浆，炸至金黄酥脆，口感轻盈。',
-                        price: 98.00
-                    },
-                    {
-                        id: 'menu-jp-4',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=章鱼小丸子',
-                        title: '章鱼小丸子',
-                        description: '外焦里嫩，Q弹章鱼块，淋上特制酱汁和木鱼花。',
-                        price: 30.00
-                    },
-                    // 韩餐
-                    {
-                        id: 'menu-kr-1',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=韩式拌饭',
-                        title: '韩式拌饭',
-                        description: '五彩蔬菜、肉类与米饭拌入特制辣酱，营养均衡。',
-                        price: 65.00
-                    },
-                    {
-                        id: 'menu-kr-2',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=部队锅',
-                        title: '韩式部队锅',
-                        description: '丰盛的食材，浓郁的汤底，泡菜、火腿、芝士的完美融合。',
-                        price: 118.00
-                    },
-                    {
-                        id: 'menu-kr-3',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=韩式烤肉',
-                        title: '韩式烤肉',
-                        description: '秘制酱料腌制肉片，搭配生菜、泡菜，感受韩式风味。',
-                        price: 158.00
-                    },
-                    {
-                        id: 'menu-kr-4',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=辣炒年糕',
-                        title: '韩式辣炒年糕',
-                        description: 'Q弹年糕与鱼饼在甜辣酱汁中翻炒，街头美食的经典。',
-                        price: 55.00
-                    }
-                ];
-                menuItems = loadFromLocalStorage('myMenu', defaultMenuItems);
-                saveMenu(); // 确保默认数据也被保存一次
-            }
-
-            function saveMenu() {
-                saveToLocalStorage('myMenu', menuItems);
-            }
-
-            function renderMenu() {
-                menuGrid.innerHTML = ''; // 清空现有内容
-
-                menuItems.forEach(item => {
-                    const menuItemElement = document.createElement('div');
-                    menuItemElement.classList.add('menu-item');
-                    menuItemElement.dataset.id = item.id;
-
-                    menuItemElement.innerHTML = `
-                        <img src="${item.imageSrc}" alt="${item.title}">
-                        <h3 contenteditable="false">${item.title}</h3>
-                        <p contenteditable="false">${item.description}</p>
-                        <span class="price" contenteditable="false">¥ ${item.price.toFixed(2)}</span>
-                        <div class="item-actions menu-actions">
-                            <label for="menu-file-input-${item.id}" class="upload-label" style="display: none;">更换图片</label>
-                            <input type="file" id="menu-file-input-${item.id}" accept="image/*" style="display: none;">
-                            <button class="btn edit-menu-btn">编辑</button>
-                            <button class="btn delete-menu-btn">删除</button>
-                        </div>
-                        <button class="btn select-menu-btn">点菜</button>
-                    `;
-                    menuGrid.appendChild(menuItemElement);
-                });
-            }
-
-            function toggleMenuEditMode(itemElement, isEditMode) {
-                const itemId = itemElement.dataset.id;
-                const itemData = menuItems.find(item => item.id === itemId);
-
-                const titleElement = itemElement.querySelector('h3');
-                const descriptionElement = itemElement.querySelector('p');
-                const priceElement = itemElement.querySelector('.price');
-                const editSaveBtn = itemElement.querySelector('.edit-menu-btn, .save-menu-btn');
-                const uploadLabel = itemElement.querySelector('.upload-label');
-                const selectMenuBtn = itemElement.querySelector('.select-menu-btn');
-
-
-                if (!itemData) return;
-
-                if (isEditMode) {
-                    itemElement.classList.add('editing');
-                    titleElement.setAttribute('contenteditable', 'true');
-                    descriptionElement.setAttribute('contenteditable', 'true');
-                    priceElement.setAttribute('contenteditable', 'true');
-                    titleElement.focus();
-
-                    editSaveBtn.textContent = '保存';
-                    editSaveBtn.classList.remove('edit-menu-btn');
-                    editSaveBtn.classList.add('save-menu-btn');
-                    uploadLabel.style.display = 'inline-block';
-                    selectMenuBtn.style.display = 'none'; // 编辑时隐藏点菜按钮
-
-                } else {
-                    itemElement.classList.remove('editing');
-                    titleElement.removeAttribute('contenteditable');
-                    descriptionElement.removeAttribute('contenteditable');
-                    priceElement.removeAttribute('contenteditable');
-
-                    itemData.title = titleElement.textContent.trim();
-                    itemData.description = descriptionElement.textContent.trim();
-                    // 尝试解析价格，如果无效则保留原价
-                    const newPrice = parseFloat(priceElement.textContent.replace(/[^\d.]/g, '')); // 移除所有非数字和小数点的字符
-                    if (!isNaN(newPrice) && newPrice >= 0) { // 确保是有效数字且不为负
-                        itemData.price = newPrice;
-                    } else {
-                        alert('价格输入无效，已恢复原价。请确保输入的是数字。');
-                    }
-                    priceElement.textContent = `¥ ${itemData.price.toFixed(2)}`; // 强制更新显示为固定格式
-
-                    saveMenu();
-                    renderMenu(); // 重新渲染页面以反映更改 (价格、图片)
-                }
-            }
-
-            // ========================= 心愿清单相关函数 =========================
-            function loadWishlist() {
-                wishlistItems = loadFromLocalStorage('myWishlist', [
-                    {
-                        id: 'wish-1',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=智能手表',
-                        title: '一款智能手表',
-                        description: '希望拥有一款能够追踪健康数据、方便生活与运动的智能穿戴设备。',
-                        status: 'pending'
-                    },
-                    {
-                        id: 'wish-2',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=浪漫旅行',
-                        title: '一次浪漫旅行',
-                        description: '希望和你一起去一个美丽的地方，留下属于我们的美好回忆。',
-                        status: 'pending'
-                    },
-                    {
-                        id: 'wish-3',
-                        imageSrc: 'https://via.placeholder.com/300x200?text=一本好书',
-                        title: '一本深度与广度兼具的文学作品，丰富精神世界。',
-                        status: 'fulfilled'
-                    }
-                ]);
-                saveWishlist(); // 确保默认数据也被保存一次
-            }
-
-            function saveWishlist() {
-                saveToLocalStorage('myWishlist', wishlistItems);
-            }
-
-            function renderWishlist() {
-                wishlistGrid.innerHTML = ''; // 清空现有内容
-
-                wishlistItems.forEach(item => {
-                    const wishlistItemElement = document.createElement('div');
-                    wishlistItemElement.classList.add('wishlist-item');
-                    wishlistItemElement.dataset.id = item.id;
-
-                    const statusText = item.status === 'pending' ? '未达成' : '已达成';
-
-                    wishlistItemElement.innerHTML = `
-                        <img src="${item.imageSrc}" alt="${item.title}">
-                        <h3 contenteditable="false">${item.title}</h3>
-                        <p contenteditable="false">${item.description}</p>
-                        <p class="status ${item.status}" data-status="${item.status}">${statusText}</p>
-                        <div class="item-actions">
-                            <label for="wish-file-input-${item.id}" class="upload-label" style="display: none;">更换图片</label>
-                            <input type="file" id="wish-file-input-${item.id}" accept="image/*" style="display: none;">
-                            <button class="btn edit-btn">编辑</button>
-                            <button class="btn delete-btn">删除</button>
-                        </div>
-                    `;
-                    wishlistGrid.appendChild(wishlistItemElement);
-                });
-            }
-
-            function toggleWishlistEditMode(itemElement, isEditMode) {
-                const itemId = itemElement.dataset.id;
-                const itemData = wishlistItems.find(item => item.id === itemId);
-
-                const titleElement = itemElement.querySelector('h3');
-                const descriptionElement = itemElement.querySelector('p:not(.status)');
-                const statusElement = itemElement.querySelector('.status');
-                const editSaveBtn = itemElement.querySelector('.edit-btn, .save-btn');
-                const uploadLabel = itemElement.querySelector('.upload-label');
-
-                if (!itemData) return;
-
-                if (isEditMode) {
-                    itemElement.classList.add('editing');
-                    titleElement.setAttribute('contenteditable', 'true');
-                    descriptionElement.setAttribute('contenteditable', 'true');
-                    titleElement.focus();
-
-                    statusElement.innerHTML = `
-                        <select class="status-select">
-                            <option value="pending" ${itemData.status === 'pending' ? 'selected' : ''}>未达成</option>
-                            <option value="fulfilled" ${itemData.status === 'fulfilled' ? 'selected' : ''}>已达成</option>
-                        </select>
-                    `;
-
-                    editSaveBtn.textContent = '保存';
-                    editSaveBtn.classList.remove('edit-btn');
-                    editSaveBtn.classList.add('save-btn');
-                    uploadLabel.style.display = 'inline-block';
-                } else {
-                    itemElement.classList.remove('editing');
-                    titleElement.removeAttribute('contenteditable');
-                    descriptionElement.removeAttribute('contenteditable');
-
-                    itemData.title = titleElement.textContent.trim();
-                    itemData.description = descriptionElement.textContent.trim();
-
-                    const statusSelect = itemElement.querySelector('.status-select');
-                    if (statusSelect) {
-                        itemData.status = statusSelect.value;
-                    }
-
-                    saveWishlist();
-                    renderWishlist(); // 重新渲染页面以反映更改
-                }
-            }
-
-            // ========================= 订单管理相关函数 =========================
-            function loadSelectedOrder() {
-                selectedOrder = loadFromLocalStorage('mySelectedOrder', []);
-            }
-
-            function saveSelectedOrder() {
-                saveToLocalStorage('mySelectedOrder', selectedOrder);
-            }
-
-            function addToOrder(menuItemId) {
-                // 从当前菜单数据中查找菜品，而不是固定数据
-                const menuItem = menuItems.find(item => item.id === menuItemId);
-                if (!menuItem) return;
-
-                const existingOrderItem = selectedOrder.find(item => item.id === menuItemId);
-                if (existingOrderItem) {
-                    existingOrderItem.quantity++;
-                } else {
-                    selectedOrder.push({
-                        id: menuItem.id,
-                        title: menuItem.title,
-                        price: menuItem.price,
-                        quantity: 1
-                    });
-                }
-                saveSelectedOrder();
-                renderOrderSummary();
-            }
-
-            // 增加菜品数量
-            function increaseOrderItemQuantity(orderItemId) {
-                const orderItem = selectedOrder.find(item => item.id === orderItemId);
-                if (orderItem) {
-                    orderItem.quantity++;
-                    saveSelectedOrder();
-                    renderOrderSummary();
-                }
-            }
-
-            // 减少菜品数量
-            function decreaseOrderItemQuantity(orderItemId) {
-                const orderItem = selectedOrder.find(item => item.id === orderItemId);
-                if (orderItem) {
-                    orderItem.quantity--;
-                    if (orderItem.quantity <= 0) {
-                        // 如果数量小于等于0，则移除该菜品
-                        selectedOrder = selectedOrder.filter(item => item.id !== orderItemId);
-                    }
-                    saveSelectedOrder();
-                    renderOrderSummary();
-                }
-            }
-
-            function renderOrderSummary() {
-                orderSummaryList.innerHTML = '';
-                let total = 0;
-
-                if (selectedOrder.length === 0) {
-                    orderSummaryList.innerHTML = '<p>暂无已点菜品。</p>';
-                } else {
-                    selectedOrder.forEach(orderItem => {
-                        const listItem = document.createElement('div');
-                        listItem.classList.add('order-list-item');
-                        listItem.innerHTML = `
-                            <div class="order-item-details">
-                                <span>${orderItem.title}</span>
-                                <div class="qty-controls">
-                                    <button class="btn btn-qty decrease-qty-btn" data-id="${orderItem.id}">-</button>
-                                    <input type="number" class="item-qty-input" value="${orderItem.quantity}" min="0" data-id="${orderItem.id}">
-                                    <button class="btn btn-qty increase-qty-btn" data-id="${orderItem.id}">+</button>
-                                </div>
-                            </div>
-                            <div class="order-item-price-actions">
-                                <span>¥ ${(orderItem.price * orderItem.quantity).toFixed(2)}</span>
-                                <button class="btn btn-small remove-order-item-btn" data-id="${orderItem.id}">移除</button>
-                            </div>
-                        `;
-                        orderSummaryList.appendChild(listItem);
-                        total += orderItem.price * orderItem.quantity;
-                    });
-                }
-                orderTotalSpan.textContent = `¥ ${total.toFixed(2)}`;
-            }
-
-            function clearOrder() {
-                if (confirm('确定要清空所有已点菜品吗？')) {
-                    selectedOrder = [];
-                    saveSelectedOrder();
-                    renderOrderSummary();
-                    alert('订单已清空！');
-                }
-            }
-
-            function confirmOrder() {
-                if (selectedOrder.length === 0) {
-                    alert('您的订单为空，请先点菜！');
-                    return;
-                }
-
-                let orderDetailsText = "";
-                let totalAmount = 0;
-                const currentDate = new Date().toLocaleString();
-
-                orderDetailsText += `订单时间: ${currentDate}\n`;
-                orderDetailsText += `\n--- 订单详情 ---\n`;
-
-                selectedOrder.forEach(item => {
-                    const subtotal = item.price * item.quantity;
-                    orderDetailsText += `${item.title} x ${item.quantity} (¥ ${item.price.toFixed(2)}/份) = ¥ ${subtotal.toFixed(2)}\n`;
-                    totalAmount += subtotal;
-                });
-
-                orderDetailsText += `\n总计：¥ ${totalAmount.toFixed(2)}\n`;
-                orderDetailsText += `\n这是一个来自胖欣欣瘦媛媛家庭呵护网的新订单通知。\n请及时处理！`;
-
-                // --- 邮件通知部分（使用 mailto: 协议） ---
-                // 使用 encodeURIComponent 编码，以确保特殊字符在URL中正确显示
-                const recipientEmail = "xinluo1231998@gmail.com"; // <-- 您的邮箱地址
-                const subject = encodeURIComponent(`胖欣欣瘦媛媛家庭呵护网 - 新订单通知 (${currentDate})`);
-                const body = encodeURIComponent(orderDetailsText);
-
-                const mailtoLink = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
-
-                // 提示用户并尝试打开邮件客户端
-                alert("订单已成功提交！\n\n接下来将尝试打开您的邮件客户端发送通知。\n请在弹出的邮件窗口中点击“发送”按钮以完成通知。\n\n完整的订单信息已在浏览器控制台（F12）中打印。");
-
-                // 在新窗口或标签页中打开 mailto 链接，避免直接跳转当前页面
-                window.open(mailtoLink, '_blank');
-                // --- 邮件通知部分结束 ---
-
-
-                // !! 后台接收信息模拟 (打印到控制台) !!
-                // 此部分保持不变，以便您仍然可以在控制台查看完整的结构化数据
-                console.log('--- 模拟订单数据发送到后台 ---');
-                console.log('订单数据:', {
-                    timestamp: currentDate,
-                    items: selectedOrder.map(item => ({
-                        id: item.id,
-                        title: item.title,
-                        price: item.price,
-                        quantity: item.quantity,
-                        subtotal: (item.price * item.quantity).toFixed(2)
-                    })),
-                    total: totalAmount.toFixed(2)
-                });
-                console.log('提示: 这部分数据现在打印在浏览器控制台。要实现真正的后台接收和自动邮件通知，需要后端服务和API。');
-                console.log('----------------------------');
-
-                // 订单确认后清空订单
-                selectedOrder = [];
-                saveSelectedOrder();
-                renderOrderSummary();
-            }
-
-            // ========================= 导入/导出功能函数 =========================
-
-            // 导出数据通用函数
-            function exportData(data, filename) {
-                const jsonData = JSON.stringify(data, null, 2); // 格式化JSON，方便阅读
-                const blob = new Blob([jsonData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                alert(`数据已成功导出为 ${filename}`);
-            }
-
-            // 导入数据通用函数
-            function importData(event, type) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedArray = JSON.parse(e.target.result);
-
-                        // 简单的验证
-                        if (!Array.isArray(importedArray)) {
-                            throw new Error('导入的文件不是有效的数组格式。');
-                        }
-
-                        let isValid = true;
-                        let message = '';
-
-                        if (type === 'wishlist') {
-                            isValid = importedArray.every(item =>
-                                typeof item.id === 'string' &&
-                                typeof item.imageSrc === 'string' &&
-                                typeof item.title === 'string' &&
-                                typeof item.description === 'string' &&
-                                ['pending', 'fulfilled'].includes(item.status)
-                            );
-                            message = '心愿清单';
-                        } else if (type === 'order') {
-                            isValid = importedArray.every(item =>
-                                typeof item.id === 'string' &&
-                                typeof item.title === 'string' &&
-                                typeof item.price === 'number' &&
-                                typeof item.quantity === 'number' &&
-                                item.quantity >= 0
-                            );
-                            message = '订单';
-                        } else if (type === 'menu') {
-                            isValid = importedArray.every(item =>
-                                typeof item.id === 'string' &&
-                                typeof item.imageSrc === 'string' &&
-                                typeof item.title === 'string' &&
-                                typeof item.description === 'string' &&
-                                typeof item.price === 'number' &&
-                                item.price >= 0
-                            );
-                            message = '菜单';
-                        }
-
-                        if (!isValid) {
-                            throw new Error(`导入的${message}数据结构不符合预期，请检查JSON文件内容。`);
-                        }
-
-                        if (confirm(`确定要导入${message}吗？这会覆盖当前所有${message}数据。`)) {
-                            if (type === 'wishlist') {
-                                wishlistItems = importedArray;
-                                saveWishlist();
-                                renderWishlist();
-                            } else if (type === 'order') {
-                                selectedOrder = importedArray;
-                                saveSelectedOrder();
-                                renderOrderSummary();
-                            } else if (type === 'menu') {
-                                menuItems = importedArray;
-                                saveMenu();
-                                renderMenu();
-                            }
-                            alert(`${message}已成功导入！`);
-                        }
-                    } catch (error) {
-                        console.error('导入数据失败:', error);
-                        alert('导入数据失败: ' + error.message + '\n请确保导入的是有效的JSON文件且数据结构正确。');
-                    }
-                };
-                reader.readAsText(file);
-                // 清空文件输入框，以便再次选择相同文件
-                event.target.value = '';
-            }
-
-
-            // ========================= 事件监听器 =========================
-            // 菜单“添加新菜品”按钮
-            addMenuItemBtn.addEventListener('click', () => {
-                const newId = `menu-${Date.now()}`;
-                const newItem = {
-                    id: newId,
-                    imageSrc: 'https://via.placeholder.com/300x200?text=新菜品图片',
-                    title: '新菜品名称',
-                    description: '新菜品描述...',
-                    price: 0.00
-                };
-                menuItems.unshift(newItem); // 添加到数组开头
-                saveMenu();
-                renderMenu(); // 重新渲染整个列表
-
-                const newItemElement = menuGrid.querySelector(`[data-id="${newId}"]`);
-                if (newItemElement) {
-                    toggleMenuEditMode(newItemElement, true);
-                    newItemElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-
-            // 菜单项事件委托（编辑、删除、图片上传、点菜）
-            menuGrid.addEventListener('click', (event) => {
-                const target = event.target;
-                const menuItemElement = target.closest('.menu-item');
-
-                if (!menuItemElement) return;
-
-                const itemId = menuItemElement.dataset.id;
-
-                if (target.classList.contains('delete-menu-btn')) {
-                    if (confirm('确定要删除此菜品吗？')) {
-                        menuItems = menuItems.filter(item => item.id !== itemId);
-                        saveMenu();
-                        renderMenu();
-                    }
-                } else if (target.classList.contains('edit-menu-btn')) {
-                    toggleMenuEditMode(menuItemElement, true);
-                } else if (target.classList.contains('save-menu-btn')) {
-                    toggleMenuEditMode(menuItemElement, false);
-                } else if (target.classList.contains('upload-label')) {
-                    const fileInput = menuItemElement.querySelector(`#menu-file-input-${itemId}`);
-                    if (fileInput) {
-                        fileInput.click();
-                    }
-                } else if (target.classList.contains('select-menu-btn')) {
-                    addToOrder(itemId);
-                }
-            });
-
-            // 菜单项图片上传
-            menuGrid.addEventListener('change', (event) => {
-                const target = event.target;
-                if (target.type === 'file' && target.accept === 'image/*') {
-                    const menuItemElement = target.closest('.menu-item');
-                    const itemId = menuItemElement.dataset.id;
-                    const itemData = menuItems.find(item => item.id === itemId);
-
-                    if (itemData && target.files && target.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            itemData.imageSrc = e.target.result;
-                            saveMenu();
-                            menuItemElement.querySelector('img').src = e.target.result;
-                        };
-                        reader.readAsDataURL(target.files[0]);
-                    }
-                }
-            });
-
-
-            // 心愿清单事件委托
-            wishlistGrid.addEventListener('click', (event) => {
-                const target = event.target;
-                const wishlistItem = target.closest('.wishlist-item');
-
-                if (!wishlistItem) return;
-
-                const itemId = wishlistItem.dataset.id;
-
-                if (target.classList.contains('delete-btn')) {
-                    if (confirm('确定要删除此心愿吗？')) {
-                        wishlistItems = wishlistItems.filter(item => item.id !== itemId);
-                        saveWishlist();
-                        renderWishlist();
-                    }
-                } else if (target.classList.contains('edit-btn')) {
-                    toggleWishlistEditMode(wishlistItem, true);
-                } else if (target.classList.contains('save-btn')) {
-                    toggleWishlistEditMode(wishlistItem, false);
-                } else if (target.classList.contains('upload-label')) {
-                    const fileInput = wishlistItem.querySelector(`#wish-file-input-${itemId}`);
-                    if (fileInput) {
-                        fileInput.click();
-                    }
-                }
-            });
-
-            // 心愿清单文件输入框的 change 事件
-            wishlistGrid.addEventListener('change', (event) => {
-                const target = event.target;
-                if (target.type === 'file' && target.accept === 'image/*') {
-                    const wishlistItemElement = target.closest('.wishlist-item');
-                    const itemId = wishlistItemElement.dataset.id;
-                    const itemData = wishlistItems.find(item => item.id === itemId);
-
-                    if (itemData && target.files && target.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            itemData.imageSrc = e.target.result;
-                            saveWishlist();
-                            wishlistItemElement.querySelector('img').src = e.target.result;
-                        };
-                        reader.readAsDataURL(target.files[0]);
-                    }
-                }
-            });
-
-            // 添加新心愿按钮点击事件
-            addWishBtn.addEventListener('click', () => {
-                const newId = `wish-${Date.now()}`;
-                const newItem = {
-                    id: newId,
-                    imageSrc: 'https://via.placeholder.com/300x200?text=点击更换图片',
-                    title: '新心愿标题',
-                    description: '请在此输入您的心愿描述...',
-                    status: 'pending'
-                };
-                wishlistItems.unshift(newItem);
-                saveWishlist();
-                renderWishlist();
-
-                const newItemElement = wishlistGrid.querySelector(`[data-id="${newId}"]`);
-                if (newItemElement) {
-                    toggleWishlistEditMode(newItemElement, true);
-                    newItemElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-
-
-            // 订单“移除”、“增加数量”和“减少数量”按钮事件委托
-            orderSummaryList.addEventListener('click', (event) => {
-                const target = event.target;
-                const orderItemId = target.dataset.id;
-
-                if (target.classList.contains('remove-order-item-btn')) {
-                    if (confirm('确定要移除此菜品吗？')) {
-                        selectedOrder = selectedOrder.filter(item => item.id !== orderItemId);
-                        saveSelectedOrder();
-                        renderOrderSummary();
-                    }
-                } else if (target.classList.contains('increase-qty-btn')) {
-                    increaseOrderItemQuantity(orderItemId);
-                } else if (target.classList.contains('decrease-qty-btn')) {
-                    decreaseOrderItemQuantity(orderItemId);
-                }
-            });
-
-            // 订单数量输入框的 change 事件 (失去焦点或按回车时触发)
-            orderSummaryList.addEventListener('change', (event) => {
-                const target = event.target;
-                if (target.classList.contains('item-qty-input')) {
-                    const orderItemId = target.dataset.id;
-                    let newQuantity = parseInt(target.value, 10);
-
-                    if (isNaN(newQuantity) || newQuantity < 0) {
-                        // Revert to previous valid quantity if input is invalid
-                        const currentItem = selectedOrder.find(item => item.id === orderItemId);
-                        target.value = currentItem ? currentItem.quantity : 1; // Default to 1 if not found or invalid
-                        alert('请输入有效的数量 (非负整数)。');
-                        return;
-                    }
-
-                    // Find the item and update its quantity
-                    const orderItem = selectedOrder.find(item => item.id === orderItemId);
-                    if (orderItem) {
-                        if (newQuantity === 0) {
-                            // If quantity becomes 0, remove the item
-                            selectedOrder = selectedOrder.filter(item => item.id !== orderItemId);
-                        } else {
-                            orderItem.quantity = newQuantity;
-                        }
-                        saveSelectedOrder();
-                        renderOrderSummary();
-                    }
-                }
-            });
-
-
-            // 订单“清空”按钮事件
-            clearOrderBtn.addEventListener('click', clearOrder);
-
-            // 订单“确认订单”按钮事件
-            confirmOrderBtn.addEventListener('click', confirmOrder);
-
-            // 导入/导出事件监听
-            exportMenuBtn.addEventListener('click', () => exportData(menuItems, '胖欣欣瘦媛媛_菜单.json'));
-            importMenuFile.addEventListener('change', (e) => importData(e, 'menu'));
-
-            exportOrderBtn.addEventListener('click', () => exportData(selectedOrder, '胖欣欣瘦媛媛_我的订单.json'));
-            importOrderFile.addEventListener('change', (e) => importData(e, 'order'));
-
-            exportWishlistBtn.addEventListener('click', () => exportData(wishlistItems, '胖欣欣瘦媛媛_心愿清单.json'));
-            importWishlistFile.addEventListener('change', (e) => importData(e, 'wishlist'));
-
-
-            // ========================= 页面初始化 =========================
-            loadMenu();
-            renderMenu();
-            loadWishlist();
-            renderWishlist();
-            loadSelectedOrder();
-            renderOrderSummary();
-        });
-    </script>
-</body>
-</html>
-
-							<script>
-                            	
-							</script>
-                        </body>
-                        </html>
-                    
