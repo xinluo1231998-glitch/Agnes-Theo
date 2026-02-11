@@ -1,3 +1,1779 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>胖欣欣 & 瘦媛媛的专属情人节</title>
+  <meta name="description" content="极简莫兰迪风：点菜 + 心愿 + 确认下单（本地保存 + 高清图 IndexedDB + Formspree 邮件通知）" />
+  <style>
+    :root{
+      /* Morandi palette */
+      --bg: #F6F3EE;          /* 奶油白 */
+      --card: #FFFFFF;
+      --ink: #1F2328;
+      --muted: #6D7179;
+      --line: rgba(31,35,40,.10);
+
+      --pink: #C7A5A9;        /* 莫兰迪粉 */
+      --sage: #AEB9AD;        /* 灰绿 */
+      --slate: #8D97A1;       /* 灰蓝 */
+      --clay: #C8B3A4;        /* 奶茶 */
+
+      --shadow: 0 14px 36px rgba(31,35,40,.08);
+      --shadow2: 0 10px 22px rgba(31,35,40,.06);
+      --radius: 22px;
+      --radius2: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      letter-spacing: .1px;
+    }
+
+    .wrap{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 16px 56px;
+    }
+
+    /* Header */
+    .hero{
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 22px 18px;
+    }
+
+    .heroTop{
+      display:flex;
+      justify-content: space-between;
+      align-items:flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    h1{
+      margin: 0;
+      font-size: clamp(22px, 2.5vw, 34px);
+      font-weight: 900;
+    }
+
+    .sub{
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+      max-width: 860px;
+    }
+
+    .quoteRow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.75);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: rgba(31,35,40,.78);
+    }
+
+    .heroActions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+
+    button{
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .btn{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.85);
+      padding: 10px 12px;
+      border-radius: 14px;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+    }
+    .btn:hover{ background: #fff; border-color: rgba(31,35,40,.16); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: rgba(199,165,169,.18);
+      border-color: rgba(199,165,169,.35);
+    }
+    .btn.sage{
+      background: rgba(174,185,173,.20);
+      border-color: rgba(174,185,173,.40);
+    }
+    .btn.danger{
+      background: rgba(255,255,255,.85);
+      border-color: rgba(170,70,70,.25);
+      color: rgba(140,40,40,.95);
+    }
+
+    .grid{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media(min-width: 980px){
+      .grid{ grid-template-columns: 1.55fr 1fr; }
+    }
+
+    .panel{
+      background: rgba(255,255,255,.80);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+
+    .panelHead{
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panelTitle{
+      margin:0;
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .panelDesc{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .tabs{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .tab{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.75);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: rgba(31,35,40,.78);
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab.active{
+      background: rgba(141,151,161,.14);
+      border-color: rgba(141,151,161,.35);
+      color: rgba(31,35,40,.88);
+    }
+
+    .searchRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      align-items:center;
+    }
+    .field{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      border-radius: 14px;
+      outline:none;
+      min-width: 240px;
+      flex: 1;
+    }
+    .field:focus{ border-color: rgba(141,151,161,.55); }
+
+    .content{
+      padding: 14px;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media(min-width: 640px){
+      .cards{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .card{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      border-radius: var(--radius2);
+      overflow:hidden;
+      display:flex;
+      flex-direction: column;
+      min-height: 290px;
+    }
+
+    .thumb{
+      height: 150px;
+      background: linear-gradient(135deg, rgba(199,165,169,.18), rgba(174,185,173,.16));
+      position: relative;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .thumb .thumbHint{
+      position:absolute;
+      inset:auto 10px 10px 10px;
+      display:flex;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events:none;
+    }
+    .pill{
+      border: 1px solid rgba(31,35,40,.10);
+      background: rgba(255,255,255,.72);
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 12px;
+      color: rgba(31,35,40,.78);
+      backdrop-filter: blur(6px);
+      max-width: 100%;
+      overflow:hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .cardBody{
+      padding: 12px 12px 14px;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .name{
+      margin:0;
+      font-weight: 900;
+      font-size: 15px;
+    }
+
+    .meta{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .badge{
+      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(31,35,40,.10);
+      background: rgba(255,255,255,.72);
+      color: rgba(31,35,40,.74);
+    }
+
+    .price{
+      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(31,35,40,.10);
+      background: rgba(255,255,255,.72);
+      color: rgba(31,35,40,.78);
+    }
+
+    .note{
+      width:100%;
+      min-height: 72px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding: 10px 12px;
+      outline:none;
+      line-height: 1.55;
+      color: rgba(31,35,40,.88);
+    }
+    .note:focus{ border-color: rgba(141,151,161,.55); }
+
+    .btnRow{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .selectRow{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      user-select:none;
+      font-size: 13px;
+      color: rgba(31,35,40,.82);
+    }
+
+    input[type="checkbox"]{
+      width: 18px;
+      height: 18px;
+      accent-color: var(--pink);
+    }
+
+    /* Right panel: order summary */
+    .summary{
+      padding: 14px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .summaryBox{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      border-radius: var(--radius2);
+      padding: 12px;
+    }
+
+    .summaryTitle{
+      margin:0 0 6px;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .summaryList{
+      margin:0;
+      padding-left: 18px;
+      color: rgba(31,35,40,.86);
+      line-height: 1.65;
+      font-size: 13px;
+    }
+
+    .small{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .cta{
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: space-between;
+      background: rgba(255,255,255,.78);
+    }
+
+    .ctaMain{
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ctaBig{
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .btn.big{
+      padding: 12px 14px;
+      border-radius: 16px;
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: min(380px, calc(100vw - 32px));
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(31,35,40,.10);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 12px 12px;
+      display:none;
+      gap: 8px;
+      align-items:flex-start;
+    }
+    .toast.show{ display:flex; }
+    .toast b{ font-size: 13px; }
+    .toast .t{
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-top: 2px;
+    }
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(31,35,40,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 999;
+    }
+    .modal.show{ display:flex; }
+    .modalCard{
+      width: min(720px, 100%);
+      border-radius: 22px;
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(255,255,255,.20);
+      box-shadow: 0 24px 70px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .modalHead{
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(31,35,40,.10);
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+    }
+    .modalHead .title{
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(31,35,40,.85);
+      overflow:hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+    .modalBody{
+      padding: 12px;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .formGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media(min-width: 560px){
+      .formGrid{ grid-template-columns: 1fr 1fr; }
+    }
+    .label{
+      font-size: 12px;
+      color: rgba(31,35,40,.72);
+      margin-bottom: 6px;
+    }
+    .control{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .select{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      border-radius: 14px;
+      outline:none;
+    }
+
+    /* Image preview modal */
+    .imgModalBody{
+      padding: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(255,255,255,.78);
+    }
+    .imgModalBody img{
+      max-width: 100%;
+      max-height: 78vh;
+      border-radius: 16px;
+      display:block;
+    }
+
+    footer{
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.7;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="heroTop">
+        <div>
+          <h1>胖欣欣 &amp; 瘦媛媛的专属情人节</h1>
+          <div class="sub">
+            <div>“瘦媛媛负责点餐，胖欣欣负责清盘（和买单）。”</div>
+            <div>“今日菜单：唯有爱与美食不可辜负。”</div>
+            <div>“点击确认下单，爱情即刻送达。”</div>
+          </div>
+          <div class="quoteRow">
+            <span class="chip">💾 文案/选择 自动保存（LocalStorage）</span>
+            <span class="chip">📷 高清原图 IndexedDB（不卡、不丢）</span>
+            <span class="chip">📩 下单邮件通知（Formspree）</span>
+            <span class="chip">🧁 极简莫兰迪 + 大留白</span>
+          </div>
+        </div>
+
+        <div class="heroActions">
+          <button class="btn primary" id="btnAddDish">＋ 新增菜品</button>
+          <button class="btn sage" id="btnAddWish">＋ 新增心愿</button>
+          <button class="btn" id="btnExport">导出 JSON</button>
+          <button class="btn" id="btnImport">导入 JSON</button>
+          <button class="btn danger" id="btnReset">清空所有数据</button>
+          <input id="importFile" type="file" accept="application/json" style="display:none" />
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- Left: Menu -->
+      <section class="panel">
+        <div class="panelHead">
+          <div>
+            <h2 class="panelTitle">三合一菜单（中 / 韩 / 西）</h2>
+            <div class="panelDesc">共 50 道预设菜品，你也可以自由增删改；每张卡支持上传照片（高清存本地）。</div>
+
+            <div class="tabs" id="tabs"></div>
+
+            <div class="searchRow">
+              <input class="field" id="search" placeholder="搜索菜名 / 标签（比如：牛、辣、汤、甜）" />
+              <button class="btn" id="btnClearSearch">清空</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="cards" id="dishGrid"></div>
+        </div>
+      </section>
+
+      <!-- Right: Wishlist + Order -->
+      <section class="panel">
+        <div class="panelHead">
+          <div>
+            <h2 class="panelTitle">心愿清单</h2>
+            <div class="panelDesc">写下想要的礼物/小愿望，实时添加成卡片。胖欣欣：收到✅</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="cards" id="wishGrid" style="grid-template-columns:1fr;"></div>
+        </div>
+
+        <div class="cta">
+          <div class="ctaMain">
+            <div class="ctaBig">确认订单</div>
+            <div class="small">会保存到本地，并通过 Formspree 发送邮件通知（需要你填 endpoint）。</div>
+          </div>
+          <button class="btn primary big" id="btnConfirm">确认下单 · 爱情送达</button>
+        </div>
+
+        <div class="summary">
+          <div class="summaryBox">
+            <p class="summaryTitle">已选菜单</p>
+            <ol class="summaryList" id="selectedList"></ol>
+            <div class="small" id="selectedEmpty">（还没选菜，先点勾选～）</div>
+          </div>
+
+          <div class="summaryBox">
+            <p class="summaryTitle">心愿清单</p>
+            <ol class="summaryList" id="wishSummary"></ol>
+            <div class="small" id="wishEmpty">（还没写心愿，快写一个让胖欣欣紧张一下。）</div>
+          </div>
+
+          <div class="summaryBox">
+            <p class="summaryTitle">邮件通知设置</p>
+            <div class="small">
+              1) 去 Formspree 创建表单拿到 endpoint（形如 https://formspree.io/f/xxxxxx）。<br/>
+              2) 把下面输入框填好；下单会把订单信息发到你 Formspree 绑定的邮箱。<br/>
+              3) 如果你想“发到指定邮箱”，在 Formspree 后台把转发邮箱设置成你指定的那个。
+            </div>
+            <div style="height:10px"></div>
+            <input class="field" id="formspreeEndpoint" placeholder="Formspree Endpoint：例如 https://formspree.io/f/xxxxxx" />
+            <div style="height:10px"></div>
+            <input class="field" id="yourEmailHint" placeholder="你的邮箱（仅作为订单内容字段，可不填）" />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      GitHub Pages：把本文件命名为 <b>index.html</b> 放到仓库根目录 → Settings → Pages → 选择分支部署。<br/>
+      本页面不需要后端；图片高清原图存 IndexedDB、缩略图/文本/选择存 LocalStorage。
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <div style="font-size:16px;line-height:1">✨</div>
+    <div>
+      <b id="toastTitle">提示</b>
+      <div class="t" id="toastMsg"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Dish -->
+  <div class="modal" id="dishModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div class="title" id="dishModalTitle">新增菜品</div>
+        <button class="btn" id="dishModalClose">关闭</button>
+      </div>
+      <div class="modalBody">
+        <div class="formGrid">
+          <div class="control">
+            <div class="label">菜名</div>
+            <input class="field" id="dishName" placeholder="例如：黑椒牛排" />
+          </div>
+          <div class="control">
+            <div class="label">分类</div>
+            <select class="select" id="dishCuisine">
+              <option value="中餐">中餐</option>
+              <option value="韩餐">韩餐</option>
+              <option value="西餐">西餐</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">标签（可选）</div>
+            <input class="field" id="dishTags" placeholder="例如：微辣/暖胃/甜" />
+          </div>
+          <div class="control">
+            <div class="label">价格（可选）</div>
+            <input class="field" id="dishPrice" placeholder="例如：58" inputmode="numeric" />
+          </div>
+        </div>
+        <div class="control">
+          <div class="label">备注（可选）</div>
+          <textarea class="note" id="dishNote" placeholder="例如：瘦媛媛点的，胖欣欣必须说好吃"></textarea>
+        </div>
+
+        <div class="btnRow">
+          <button class="btn primary" id="dishSave">保存</button>
+          <button class="btn" id="dishCancel">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Wish -->
+  <div class="modal" id="wishModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div class="title" id="wishModalTitle">新增心愿</div>
+        <button class="btn" id="wishModalClose">关闭</button>
+      </div>
+      <div class="modalBody">
+        <div class="control">
+          <div class="label">心愿标题</div>
+          <input class="field" id="wishTitleInput" placeholder="例如：一束奶油白玫瑰" />
+        </div>
+        <div class="control">
+          <div class="label">心愿描述（可选）</div>
+          <textarea class="note" id="wishDescInput" placeholder="例如：不要太夸张，要像你一样高级。"></textarea>
+        </div>
+        <div class="btnRow">
+          <button class="btn primary" id="wishSave">保存</button>
+          <button class="btn" id="wishCancel">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Full Image Preview -->
+  <div class="modal" id="imgModal">
+    <div class="modalCard" style="width:min(980px,100%)">
+      <div class="modalHead">
+        <div class="title" id="imgModalTitle">高清预览</div>
+        <button class="btn" id="imgModalClose">关闭</button>
+      </div>
+      <div class="imgModalBody">
+        <img id="imgModalImg" alt="full" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*****************************************************************
+     * Core requirements
+     * - 50 preset dishes (Chinese/Korean/Western) with categories
+     * - CRUD: dish cards have Edit/Delete, plus global "新增菜品"
+     * - Wishlist: dynamic add/edit/delete
+     * - Auto-save: LocalStorage for text/selection/thumbs
+     * - HD photo storage: IndexedDB for original blobs; thumbnails in LS
+     * - Confirm order: save to local AND send email via Formspree endpoint
+     *****************************************************************/
+
+    // ===== Storage Keys =====
+    const LS_DISHES = "pxxy_dishes_v3";
+    const LS_WISHES = "pxxy_wishes_v3";
+    const LS_SETTINGS = "pxxy_settings_v3";
+    const LS_ORDERS = "pxxy_orders_v3";
+
+    // IndexedDB
+    const DB_NAME = "pxxy_images_db_v3";
+    const STORE = "images";
+
+    // ===== State =====
+    let dishes = [];
+    let wishes = [];
+    let filterCuisine = "全部";
+    let searchQuery = "";
+
+    // Modal editing
+    let editingDishId = null;
+    let editingWishId = null;
+
+    // ===== DOM =====
+    const tabsEl = document.getElementById("tabs");
+    const searchEl = document.getElementById("search");
+    const dishGrid = document.getElementById("dishGrid");
+    const wishGrid = document.getElementById("wishGrid");
+
+    const selectedList = document.getElementById("selectedList");
+    const selectedEmpty = document.getElementById("selectedEmpty");
+    const wishSummary = document.getElementById("wishSummary");
+    const wishEmpty = document.getElementById("wishEmpty");
+
+    const endpointEl = document.getElementById("formspreeEndpoint");
+    const emailHintEl = document.getElementById("yourEmailHint");
+
+    // Toast
+    const toast = document.getElementById("toast");
+    const toastTitle = document.getElementById("toastTitle");
+    const toastMsg = document.getElementById("toastMsg");
+    let toastTimer = null;
+
+    // Modals
+    const dishModal = document.getElementById("dishModal");
+    const dishModalTitle = document.getElementById("dishModalTitle");
+    const dishName = document.getElementById("dishName");
+    const dishCuisine = document.getElementById("dishCuisine");
+    const dishTags = document.getElementById("dishTags");
+    const dishPrice = document.getElementById("dishPrice");
+    const dishNote = document.getElementById("dishNote");
+
+    const wishModal = document.getElementById("wishModal");
+    const wishModalTitle = document.getElementById("wishModalTitle");
+    const wishTitleInput = document.getElementById("wishTitleInput");
+    const wishDescInput = document.getElementById("wishDescInput");
+
+    const imgModal = document.getElementById("imgModal");
+    const imgModalTitle = document.getElementById("imgModalTitle");
+    const imgModalImg = document.getElementById("imgModalImg");
+
+    // ===== Init =====
+    loadAll();
+    renderAll();
+
+    // ===== Event bindings =====
+    document.getElementById("btnAddDish").addEventListener("click", () => openDishModal(null));
+    document.getElementById("btnAddWish").addEventListener("click", () => openWishModal(null));
+
+    document.getElementById("btnClearSearch").addEventListener("click", () => {
+      searchQuery = "";
+      searchEl.value = "";
+      renderAll();
+    });
+
+    searchEl.addEventListener("input", debounce(() => {
+      searchQuery = (searchEl.value || "").trim();
+      renderAll();
+    }, 120));
+
+    // Export / Import
+    const importFile = document.getElementById("importFile");
+    document.getElementById("btnImport").addEventListener("click", () => importFile.click());
+    importFile.addEventListener("change", async () => {
+      const f = importFile.files && importFile.files[0];
+      if (!f) return;
+      try{
+        const data = JSON.parse(await f.text());
+        if (!data || typeof data !== "object") throw new Error("JSON 无效");
+
+        dishes = Array.isArray(data.dishes) ? data.dishes : dishes;
+        wishes = Array.isArray(data.wishes) ? data.wishes : wishes;
+
+        saveLS(LS_DISHES, dishes);
+        saveLS(LS_WISHES, wishes);
+
+        // settings optional
+        if (data.settings && typeof data.settings === "object") {
+          saveLS(LS_SETTINGS, data.settings);
+          applySettingsFromLS();
+        }
+
+        renderAll();
+        showToast("导入成功", "文本/选择/缩略图已恢复。原图仍在 IndexedDB（若换设备需重新上传）。");
+      }catch(e){
+        showToast("导入失败", e?.message || String(e));
+      }finally{
+        importFile.value = "";
+      }
+    });
+
+    document.getElementById("btnExport").addEventListener("click", () => {
+      const payload = {
+        version: 3,
+        exportedAt: Date.now(),
+        dishes,
+        wishes,
+        settings: loadLS(LS_SETTINGS) || {},
+        note: "原图高清存 IndexedDB，不在 JSON 内；JSON 内只包含缩略图 dataURL。"
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "胖欣欣_瘦媛媛_情人节_数据.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("已导出", "JSON 已下载（原图不包含在内）。");
+    });
+
+    document.getElementById("btnReset").addEventListener("click", async () => {
+      if (!confirm("确定清空所有数据吗？（LocalStorage + IndexedDB 图片）")) return;
+      localStorage.removeItem(LS_DISHES);
+      localStorage.removeItem(LS_WISHES);
+      localStorage.removeItem(LS_SETTINGS);
+      localStorage.removeItem(LS_ORDERS);
+      dishes = [];
+      wishes = [];
+      await idbClearAll();
+      loadAll(); // rehydrate presets
+      renderAll();
+      showToast("已清空", "已恢复到默认 50 道菜（图片已清空）。");
+    });
+
+    // Settings autosave
+    endpointEl.addEventListener("input", debounce(saveSettings, 200));
+    emailHintEl.addEventListener("input", debounce(saveSettings, 200));
+
+    // Confirm order
+    document.getElementById("btnConfirm").addEventListener("click", confirmOrder);
+
+    // Dish modal
+    document.getElementById("dishModalClose").addEventListener("click", closeDishModal);
+    document.getElementById("dishCancel").addEventListener("click", closeDishModal);
+    document.getElementById("dishSave").addEventListener("click", saveDishFromModal);
+    dishModal.addEventListener("click", (e) => { if (e.target === dishModal) closeDishModal(); });
+
+    // Wish modal
+    document.getElementById("wishModalClose").addEventListener("click", closeWishModal);
+    document.getElementById("wishCancel").addEventListener("click", closeWishModal);
+    document.getElementById("wishSave").addEventListener("click", saveWishFromModal);
+    wishModal.addEventListener("click", (e) => { if (e.target === wishModal) closeWishModal(); });
+
+    // Image modal
+    document.getElementById("imgModalClose").addEventListener("click", closeImgModal);
+    imgModal.addEventListener("click", (e) => { if (e.target === imgModal) closeImgModal(); });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape"){
+        closeDishModal();
+        closeWishModal();
+        closeImgModal();
+      }
+    });
+
+    // ===== Data bootstrap =====
+    function loadAll(){
+      // Dishes
+      const lsD = loadLS(LS_DISHES);
+      if (Array.isArray(lsD) && lsD.length){
+        dishes = lsD;
+      }else{
+        dishes = makePresetDishes50();
+        saveLS(LS_DISHES, dishes);
+      }
+
+      // Wishes
+      const lsW = loadLS(LS_WISHES);
+      wishes = Array.isArray(lsW) ? lsW : [];
+      if (!Array.isArray(lsW)) saveLS(LS_WISHES, wishes);
+
+      applySettingsFromLS();
+    }
+
+    function applySettingsFromLS(){
+      const s = loadLS(LS_SETTINGS) || {};
+      endpointEl.value = s.formspreeEndpoint || "";
+      emailHintEl.value = s.yourEmailHint || "";
+    }
+
+    function saveSettings(){
+      saveLS(LS_SETTINGS, {
+        formspreeEndpoint: (endpointEl.value || "").trim(),
+        yourEmailHint: (emailHintEl.value || "").trim()
+      });
+    }
+
+    function makePresetDishes50(){
+      // 50 items: 中餐 20 / 韩餐 15 / 西餐 15
+      const base = [
+        // 中餐 20
+        ["中餐","红烧肉","家常/下饭","58"],
+        ["中餐","宫保鸡丁","微辣/经典","42"],
+        ["中餐","水煮牛肉","重辣/过瘾","68"],
+        ["中餐","酸菜鱼","酸爽/暖胃","66"],
+        ["中餐","麻婆豆腐","麻辣/拌饭","32"],
+        ["中餐","小炒黄牛肉","香辣/爆炒","62"],
+        ["中餐","糖醋里脊","酸甜/开胃","48"],
+        ["中餐","葱爆羊肉","葱香/下酒","72"],
+        ["中餐","清蒸鲈鱼","清爽/鲜","78"],
+        ["中餐","虾仁滑蛋","软嫩/治愈","45"],
+        ["中餐","番茄牛腩","浓郁/汤汁","74"],
+        ["中餐","烤鸭卷","仪式感","88"],
+        ["中餐","蒜蓉粉丝蒸扇贝","蒜香/海味","76"],
+        ["中餐","担担面","微麻/香","28"],
+        ["中餐","牛肉面（红烧）","暖胃/饱足","32"],
+        ["中餐","酸辣汤","开胃/热乎","22"],
+        ["中餐","蛋炒饭","经典/不踩雷","18"],
+        ["中餐","锅包肉","外酥里嫩","52"],
+        ["中餐","椒盐排骨","酥香/咸香","58"],
+        ["中餐","双皮奶","甜品/温柔","20"],
+
+        // 韩餐 15
+        ["韩餐","部队锅","浓郁/热辣","72"],
+        ["韩餐","泡菜炒饭","酸辣/香","36"],
+        ["韩餐","韩式炸鸡","酥脆/甜辣","56"],
+        ["韩餐","石锅拌饭","均衡/满足","48"],
+        ["韩餐","参鸡汤","滋补/暖","88"],
+        ["韩餐","海鲜豆腐汤","鲜辣/热乎","46"],
+        ["韩餐","芝士年糕","拉丝/罪恶","44"],
+        ["韩餐","烤五花肉","香/满足","68"],
+        ["韩餐","烤牛小排","高级/香","98"],
+        ["韩餐","冷面","清爽/解腻","34"],
+        ["韩餐","辣炒鱿鱼","香辣/下饭","58"],
+        ["韩餐","紫菜包饭","清爽/方便","28"],
+        ["韩餐","泡菜饼","外脆/酸香","32"],
+        ["韩餐","蜂蜜柚子茶","清甜","16"],
+        ["韩餐","草莓牛奶","甜甜","18"],
+
+        // 西餐 15
+        ["西餐","黑椒牛排","高级/满足","128"],
+        ["西餐","奶油蘑菇意面","治愈/温柔","68"],
+        ["西餐","番茄海鲜意面","鲜/酸甜","76"],
+        ["西餐","凯撒沙拉","清爽/轻盈","42"],
+        ["西餐","烤三文鱼","清爽/鲜","118"],
+        ["西餐","烤鸡腿配土豆","家常/香","88"],
+        ["西餐","蘑菇浓汤","暖胃","36"],
+        ["西餐","法式洋葱汤","层次/香","46"],
+        ["西餐","芝士披萨","拉丝/快乐","78"],
+        ["西餐","玛格丽特披萨","经典","72"],
+        ["西餐","提拉米苏","甜品/氛围","38"],
+        ["西餐","草莓奶油蛋糕","甜/浪漫","42"],
+        ["西餐","焦糖布丁","丝滑","28"],
+        ["西餐","无酒精起泡酒","仪式感","26"],
+        ["西餐","热可可","暖心","18"],
+      ];
+
+      return base.map(([cuisine, name, tags, price], idx) => ({
+        id: crypto.randomUUID(),
+        cuisine,
+        name,
+        tags,
+        price,
+        note: "",
+        selected: false,
+        thumbDataUrl: null,     // small thumb stored in LS
+        imageBlobKey: null,     // full-res blob stored in IndexedDB
+        updatedAt: Date.now() - (base.length - idx) * 1000
+      }));
+    }
+
+    // ===== Render =====
+    function renderAll(){
+      renderTabs();
+      renderDishes();
+      renderWishes();
+      renderSummary();
+      saveSettings(); // keep latest
+    }
+
+    function renderTabs(){
+      const allCount = dishes.length;
+      const cn = dishes.filter(d => d.cuisine==="中餐").length;
+      const kr = dishes.filter(d => d.cuisine==="韩餐").length;
+      const we = dishes.filter(d => d.cuisine==="西餐").length;
+
+      const tabs = [
+        ["全部", `全部 (${allCount})`],
+        ["中餐", `中餐 (${cn})`],
+        ["韩餐", `韩餐 (${kr})`],
+        ["西餐", `西餐 (${we})`]
+      ];
+
+      tabsEl.innerHTML = "";
+      tabs.forEach(([key, label]) => {
+        const t = document.createElement("div");
+        t.className = "tab" + (filterCuisine===key ? " active" : "");
+        t.textContent = label;
+        t.addEventListener("click", () => {
+          filterCuisine = key;
+          renderAll();
+        });
+        tabsEl.appendChild(t);
+      });
+    }
+
+    function renderDishes(){
+      const q = searchQuery.toLowerCase();
+      const list = dishes.filter(d => {
+        if (filterCuisine !== "全部" && d.cuisine !== filterCuisine) return false;
+        if (!q) return true;
+        return (d.name + " " + (d.tags||"") + " " + (d.note||"")).toLowerCase().includes(q);
+      });
+
+      dishGrid.innerHTML = "";
+      if (!list.length){
+        dishGrid.innerHTML = `<div class="small">没有匹配结果～（要不换个关键词？）</div>`;
+        return;
+      }
+
+      for (const dish of list){
+        dishGrid.appendChild(renderDishCard(dish));
+      }
+    }
+
+    function renderDishCard(d){
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.decoding = "async";
+
+      if (d.thumbDataUrl){
+        img.src = d.thumbDataUrl;
+      }else{
+        img.style.opacity = "0";
+      }
+
+      thumb.appendChild(img);
+
+      const hint = document.createElement("div");
+      hint.className = "thumbHint";
+      const p1 = document.createElement("div");
+      p1.className = "pill";
+      p1.textContent = d.thumbDataUrl ? "点我看高清 / 换图" : "上传照片（高清）";
+      const p2 = document.createElement("div");
+      p2.className = "pill";
+      p2.textContent = d.cuisine;
+      hint.append(p1, p2);
+      thumb.appendChild(hint);
+
+      const body = document.createElement("div");
+      body.className = "cardBody";
+
+      const top = document.createElement("div");
+      top.className = "row";
+      const name = document.createElement("p");
+      name.className = "name";
+      name.textContent = d.name;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const b1 = document.createElement("span");
+      b1.className = "badge";
+      b1.textContent = d.tags || "—";
+      const b2 = document.createElement("span");
+      b2.className = "price";
+      b2.textContent = d.price ? "¥ " + d.price : "¥ —";
+      meta.append(b1, b2);
+
+      top.append(name, meta);
+
+      const note = document.createElement("textarea");
+      note.className = "note";
+      note.placeholder = "写点可爱备注：不要香菜/要加辣/瘦媛媛说这道必须点…";
+      note.value = d.note || "";
+
+      const selectRow = document.createElement("div");
+      selectRow.className = "selectRow";
+      const toggle = document.createElement("label");
+      toggle.className = "toggle";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!d.selected;
+      const span = document.createElement("span");
+      span.textContent = d.selected ? "已选中（胖欣欣准备清盘）" : "加入订单";
+      toggle.append(cb, span);
+
+      cb.addEventListener("change", () => {
+        d.selected = cb.checked;
+        span.textContent = d.selected ? "已选中（胖欣欣准备清盘）" : "加入订单";
+        d.updatedAt = Date.now();
+        saveLS(LS_DISHES, dishes);
+        renderSummary();
+      });
+
+      // Buttons
+      const btnRow = document.createElement("div");
+      btnRow.className = "btnRow";
+      const btnEdit = document.createElement("button");
+      btnEdit.className = "btn";
+      btnEdit.textContent = "编辑";
+      btnEdit.addEventListener("click", () => openDishModal(d.id));
+
+      const btnDel = document.createElement("button");
+      btnDel.className = "btn danger";
+      btnDel.textContent = "删除";
+      btnDel.addEventListener("click", () => {
+        if (!confirm(`确定删除「${d.name}」吗？`)) return;
+        // remove from list
+        dishes = dishes.filter(x => x.id !== d.id);
+        saveLS(LS_DISHES, dishes);
+        renderAll();
+        showToast("已删除", "这道菜被胖欣欣悄悄划掉了。");
+      });
+
+      const btnUpload = document.createElement("button");
+      btnUpload.className = "btn primary";
+      btnUpload.textContent = "上传/更换照片";
+      btnUpload.addEventListener("click", () => fileInput.click());
+
+      btnRow.append(btnUpload, btnEdit, btnDel);
+
+      selectRow.append(toggle);
+
+      body.append(top, note, selectRow, btnRow);
+
+      // hidden file input
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*";
+      fileInput.style.display = "none";
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        const MAX_MB = 15;
+        if (file.size > MAX_MB * 1024 * 1024){
+          showToast("图片太大", `超过 ${MAX_MB}MB，建议压缩后再上传。`);
+          fileInput.value = "";
+          return;
+        }
+
+        const blobKey = `dish:${d.id}:full`;
+        await idbSet(blobKey, file);
+
+        const thumbUrl = await makeThumbnailDataUrl(file, 900, 0.86);
+
+        d.imageBlobKey = blobKey;
+        d.thumbDataUrl = thumbUrl;
+        d.updatedAt = Date.now();
+
+        saveLS(LS_DISHES, dishes);
+        renderDishes();
+        showToast("已保存图片", "原图已存 IndexedDB，缩略图用于快速显示。");
+
+        fileInput.value = "";
+      });
+
+      // note autosave
+      note.addEventListener("input", debounce(() => {
+        d.note = note.value;
+        d.updatedAt = Date.now();
+        saveLS(LS_DISHES, dishes);
+        renderSummary();
+      }, 220));
+
+      // click thumb to view full / upload
+      thumb.addEventListener("click", async () => {
+        if (!d.imageBlobKey){
+          fileInput.click();
+          return;
+        }
+        await showFullImage(d.imageBlobKey, `${d.cuisine} · ${d.name}`);
+      });
+
+      card.append(thumb, body, fileInput);
+      return card;
+    }
+
+    function renderWishes(){
+      wishGrid.innerHTML = "";
+
+      if (!wishes.length){
+        wishGrid.innerHTML = `<div class="small">还没有心愿～ 点右上角「新增心愿」写一个吧。</div>`;
+        return;
+      }
+
+      for (const w of wishes){
+        wishGrid.appendChild(renderWishCard(w));
+      }
+    }
+
+    function renderWishCard(w){
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.minHeight = "260px";
+
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.decoding = "async";
+      if (w.thumbDataUrl){
+        img.src = w.thumbDataUrl;
+      }else{
+        img.style.opacity = "0";
+      }
+      thumb.appendChild(img);
+
+      const hint = document.createElement("div");
+      hint.className = "thumbHint";
+      const p1 = document.createElement("div");
+      p1.className = "pill";
+      p1.textContent = w.thumbDataUrl ? "点我看高清 / 换图" : "给心愿配张图（高清）";
+      const p2 = document.createElement("div");
+      p2.className = "pill";
+      p2.textContent = "Wishlist";
+      hint.append(p1, p2);
+      thumb.appendChild(hint);
+
+      const body = document.createElement("div");
+      body.className = "cardBody";
+
+      const top = document.createElement("div");
+      top.className = "row";
+
+      const name = document.createElement("p");
+      name.className = "name";
+      name.textContent = w.title;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const b = document.createElement("span");
+      b.className = "badge";
+      b.textContent = "心愿";
+      meta.append(b);
+
+      top.append(name, meta);
+
+      const note = document.createElement("textarea");
+      note.className = "note";
+      note.placeholder = "写点描述：颜色/预算/想要的感觉…（胖欣欣会认真看）";
+      note.value = w.desc || "";
+
+      const btnRow = document.createElement("div");
+      btnRow.className = "btnRow";
+
+      const btnUpload = document.createElement("button");
+      btnUpload.className = "btn primary";
+      btnUpload.textContent = "上传/更换照片";
+      btnUpload.addEventListener("click", () => fileInput.click());
+
+      const btnEdit = document.createElement("button");
+      btnEdit.className = "btn";
+      btnEdit.textContent = "编辑";
+      btnEdit.addEventListener("click", () => openWishModal(w.id));
+
+      const btnDel = document.createElement("button");
+      btnDel.className = "btn danger";
+      btnDel.textContent = "删除";
+      btnDel.addEventListener("click", () => {
+        if (!confirm(`确定删除心愿「${w.title}」吗？`)) return;
+        wishes = wishes.filter(x => x.id !== w.id);
+        saveLS(LS_WISHES, wishes);
+        renderAll();
+        showToast("已删除", "心愿暂时被收进抽屉里。");
+      });
+
+      btnRow.append(btnUpload, btnEdit, btnDel);
+
+      // hidden file input
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*";
+      fileInput.style.display = "none";
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        const MAX_MB = 15;
+        if (file.size > MAX_MB * 1024 * 1024){
+          showToast("图片太大", `超过 ${MAX_MB}MB，建议压缩后再上传。`);
+          fileInput.value = "";
+          return;
+        }
+
+        const blobKey = `wish:${w.id}:full`;
+        await idbSet(blobKey, file);
+
+        const thumbUrl = await makeThumbnailDataUrl(file, 900, 0.86);
+
+        w.imageBlobKey = blobKey;
+        w.thumbDataUrl = thumbUrl;
+        w.updatedAt = Date.now();
+
+        saveLS(LS_WISHES, wishes);
+        renderWishes();
+        renderSummary();
+        showToast("已保存图片", "原图已存 IndexedDB，缩略图用于快速显示。");
+
+        fileInput.value = "";
+      });
+
+      note.addEventListener("input", debounce(() => {
+        w.desc = note.value;
+        w.updatedAt = Date.now();
+        saveLS(LS_WISHES, wishes);
+        renderSummary();
+      }, 220));
+
+      thumb.addEventListener("click", async () => {
+        if (!w.imageBlobKey){
+          fileInput.click();
+          return;
+        }
+        await showFullImage(w.imageBlobKey, `心愿 · ${w.title}`);
+      });
+
+      body.append(top, note, btnRow);
+      card.append(thumb, body, fileInput);
+      return card;
+    }
+
+    function renderSummary(){
+      // Selected dishes
+      const selected = dishes.filter(d => d.selected);
+      selectedList.innerHTML = "";
+      if (!selected.length){
+        selectedEmpty.style.display = "block";
+      }else{
+        selectedEmpty.style.display = "none";
+        selected.forEach(d => {
+          const li = document.createElement("li");
+          li.textContent = `${d.cuisine}｜${d.name}${d.price ? `（¥${d.price}）` : ""}`;
+          selectedList.appendChild(li);
+        });
+      }
+
+      // Wishes summary
+      wishSummary.innerHTML = "";
+      if (!wishes.length){
+        wishEmpty.style.display = "block";
+      }else{
+        wishEmpty.style.display = "none";
+        wishes.forEach(w => {
+          const li = document.createElement("li");
+          li.textContent = w.title;
+          wishSummary.appendChild(li);
+        });
+      }
+    }
+
+    // ===== Modals: Dish =====
+    function openDishModal(id){
+      editingDishId = id;
+      if (!id){
+        dishModalTitle.textContent = "新增菜品";
+        dishName.value = "";
+        dishCuisine.value = "中餐";
+        dishTags.value = "";
+        dishPrice.value = "";
+        dishNote.value = "";
+      }else{
+        const d = dishes.find(x => x.id === id);
+        if (!d) return;
+        dishModalTitle.textContent = "编辑菜品";
+        dishName.value = d.name || "";
+        dishCuisine.value = d.cuisine || "中餐";
+        dishTags.value = d.tags || "";
+        dishPrice.value = d.price || "";
+        dishNote.value = d.note || "";
+      }
+      dishModal.classList.add("show");
+      setTimeout(() => dishName.focus(), 0);
+    }
+    function closeDishModal(){
+      dishModal.classList.remove("show");
+      editingDishId = null;
+    }
+    function saveDishFromModal(){
+      const name = (dishName.value || "").trim();
+      const cuisine = (dishCuisine.value || "").trim();
+      const tags = (dishTags.value || "").trim();
+      const price = (dishPrice.value || "").trim();
+      const note = (dishNote.value || "").trim();
+
+      if (!name){
+        showToast("缺少菜名", "请先输入菜名～");
+        dishName.focus();
+        return;
+      }
+
+      if (!editingDishId){
+        dishes.unshift({
+          id: crypto.randomUUID(),
+          cuisine: cuisine || "中餐",
+          name,
+          tags,
+          price,
+          note,
+          selected: false,
+          thumbDataUrl: null,
+          imageBlobKey: null,
+          updatedAt: Date.now()
+        });
+        saveLS(LS_DISHES, dishes);
+        renderAll();
+        closeDishModal();
+        showToast("已新增", "新菜上线，瘦媛媛请审核✅");
+      }else{
+        const d = dishes.find(x => x.id === editingDishId);
+        if (!d) return;
+        d.name = name;
+        d.cuisine = cuisine || d.cuisine;
+        d.tags = tags;
+        d.price = price;
+        d.note = note;
+        d.updatedAt = Date.now();
+        saveLS(LS_DISHES, dishes);
+        renderAll();
+        closeDishModal();
+        showToast("已保存", "编辑完成，胖欣欣说：我都可以。");
+      }
+    }
+
+    // ===== Modals: Wish =====
+    function openWishModal(id){
+      editingWishId = id;
+      if (!id){
+        wishModalTitle.textContent = "新增心愿";
+        wishTitleInput.value = "";
+        wishDescInput.value = "";
+      }else{
+        const w = wishes.find(x => x.id === id);
+        if (!w) return;
+        wishModalTitle.textContent = "编辑心愿";
+        wishTitleInput.value = w.title || "";
+        wishDescInput.value = w.desc || "";
+      }
+      wishModal.classList.add("show");
+      setTimeout(() => wishTitleInput.focus(), 0);
+    }
+    function closeWishModal(){
+      wishModal.classList.remove("show");
+      editingWishId = null;
+    }
+    function saveWishFromModal(){
+      const title = (wishTitleInput.value || "").trim();
+      const desc = (wishDescInput.value || "").trim();
+      if (!title){
+        showToast("缺少心愿标题", "先写一句你想要的～");
+        wishTitleInput.focus();
+        return;
+      }
+
+      if (!editingWishId){
+        wishes.unshift({
+          id: crypto.randomUUID(),
+          title,
+          desc,
+          thumbDataUrl: null,
+          imageBlobKey: null,
+          updatedAt: Date.now()
+        });
+        saveLS(LS_WISHES, wishes);
+        renderAll();
+        closeWishModal();
+        showToast("心愿已加入", "胖欣欣：收到！已加入待办清单。");
+      }else{
+        const w = wishes.find(x => x.id === editingWishId);
+        if (!w) return;
+        w.title = title;
+        w.desc = desc;
+        w.updatedAt = Date.now();
+        saveLS(LS_WISHES, wishes);
+        renderAll();
+        closeWishModal();
+        showToast("已保存", "心愿更新完成。");
+      }
+    }
+
+    // ===== Confirm Order (Local + Formspree) =====
+    async function confirmOrder(){
+      const selected = dishes.filter(d => d.selected);
+      if (!selected.length && !wishes.length){
+        showToast("还不能下单", "至少选一道菜或写一个心愿～");
+        return;
+      }
+
+      // Save order locally
+      const now = new Date();
+      const order = {
+        id: crypto.randomUUID(),
+        createdAt: now.toISOString(),
+        createdAtLocal: now.toLocaleString(),
+        title: "胖欣欣 & 瘦媛媛的专属情人节",
+        selectedDishes: selected.map(d => ({
+          cuisine: d.cuisine, name: d.name, price: d.price || "", tags: d.tags || "", note: d.note || ""
+        })),
+        wishes: wishes.map(w => ({ title: w.title, desc: w.desc || "" })),
+        yourEmailHint: (emailHintEl.value || "").trim()
+      };
+
+      const history = loadLS(LS_ORDERS) || [];
+      history.unshift(order);
+      saveLS(LS_ORDERS, history);
+
+      // Send email via Formspree
+      const endpoint = (endpointEl.value || "").trim();
+      if (!endpoint){
+        showToast("已保存到本地 ✅", "未填写 Formspree endpoint，因此未发送邮件。");
+        return;
+      }
+
+      showToast("正在发送邮件…", "爱情正在路上（如果失败也已保存本地）。");
+
+      try{
+        const text = buildOrderEmailText(order);
+
+        // Formspree accepts JSON (with Accept: application/json)
+        const resp = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            subject: "💌 情人节下单通知｜胖欣欣 & 瘦媛媛",
+            message: text,
+            your_email: order.yourEmailHint || "",
+            created_at: order.createdAtLocal
+          })
+        });
+
+        if (!resp.ok){
+          const t = await safeReadText(resp);
+          throw new Error(`发送失败：HTTP ${resp.status} ${resp.statusText}${t ? " / " + t : ""}`);
+        }
+
+        showToast("发送成功 ✅", "邮件已发出：胖欣欣收到订单，准备上菜（和买单）。");
+      }catch(e){
+        showToast("邮件发送失败", (e?.message || String(e)) + "（但订单已保存到本地）");
+      }
+    }
+
+    function buildOrderEmailText(order){
+      const lines = [];
+      lines.push("胖欣欣 & 瘦媛媛的专属情人节｜下单通知");
+      lines.push("—");
+      lines.push(`下单时间：${order.createdAtLocal}`);
+      if (order.yourEmailHint) lines.push(`下单人邮箱(备注)：${order.yourEmailHint}`);
+      lines.push("");
+
+      lines.push("已选菜单：");
+      if (order.selectedDishes.length){
+        order.selectedDishes.forEach((d, i) => {
+          lines.push(`${i+1}. ${d.cuisine}｜${d.name}${d.price ? `（¥${d.price}）` : ""}${d.tags ? `｜${d.tags}` : ""}`);
+          if (d.note) lines.push(`   备注：${d.note}`);
+        });
+      }else{
+        lines.push("（未选择菜品）");
+      }
+
+      lines.push("");
+      lines.push("心愿清单：");
+      if (order.wishes.length){
+        order.wishes.forEach((w, i) => {
+          lines.push(`${i+1}. ${w.title}`);
+          if (w.desc) lines.push(`   描述：${w.desc}`);
+        });
+      }else{
+        lines.push("（无心愿）");
+      }
+
+      lines.push("");
+      lines.push("俏皮备注：");
+      lines.push("“瘦媛媛负责点餐，胖欣欣负责清盘（和买单）。”");
+      lines.push("“点击确认下单，爱情即刻送达。”");
+
+      return lines.join("\n");
+    }
+
+    async function safeReadText(resp){
+      try{ return (await resp.text()).slice(0, 200); }catch{ return ""; }
+    }
+
+    // ===== Toast =====
+    function showToast(title, msg){
+      toastTitle.textContent = title;
+      toastMsg.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 4200);
+    }
+
+    // ===== LocalStorage helpers =====
+    function loadLS(key){
+      try{
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      }catch{
+        return null;
+      }
+    }
+    function saveLS(key, val){
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    // ===== Debounce =====
+    function debounce(fn, waitMs){
+      let t = null;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), waitMs);
+      };
+    }
+
+    // ===== IndexedDB (HD image blobs) =====
+    function openDB(){
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE)){
+            db.createObjectStore(STORE);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function idbSet(key, blob){
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.objectStore(STORE).put(blob, key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbGet(key){
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readonly");
+        const req = tx.objectStore(STORE).get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function idbClearAll(){
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.objectStore(STORE).clear();
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    // Thumbnail generator: small, stored in LocalStorage for fast render
+    async function makeThumbnailDataUrl(file, maxW=900, quality=0.86){
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, maxW / bmp.width);
+      const w = Math.max(1, Math.round(bmp.width * scale));
+      const h = Math.max(1, Math.round(bmp.height * scale));
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d", {alpha:false});
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(bmp, 0, 0, w, h);
+
+      // Prefer WebP; fallback JPEG
+      let type = "image/webp";
+      let url = canvas.toDataURL(type, quality);
+      if (!url.startsWith("data:image/webp")){
+        type = "image/jpeg";
+        url = canvas.toDataURL(type, quality);
+      }
+      return url;
+    }
+
+    // Full image preview
+    async function showFullImage(blobKey, title){
+      const blob = await idbGet(blobKey);
+      if (!blob){
+        showToast("找不到原图", "可能被浏览器清理过，请重新上传。");
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      imgModalTitle.textContent = title || "高清预览";
+      imgModalImg.src = url;
+      imgModal.dataset.url = url;
+      imgModal.classList.add("show");
+    }
+
+    function closeImgModal(){
+      imgModal.classList.remove("show");
+      const url = imgModal.dataset.url;
+      if (url) URL.revokeObjectURL(url);
+      imgModal.dataset.url = "";
+      imgModalImg.src = "";
+    }
+  </script>
+</body>
+</html>
 
                         <!DOCTYPE html>
                         <html lang="en">
